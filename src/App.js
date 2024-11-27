@@ -5,6 +5,7 @@ import MainPage from "./pages/main/MainPage";
 import MyPage from "./pages/my/MyPage";
 import Reservation from "./pages/Reservation/Reservation"
 import ReservationCompleted from './pages/Reservation/ReservationCompleted';
+import LoginPage from './pages/auth/LoginPage'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
               <Route path="/mypage" element={<MyPage />} />
               <Route path="/reservation" element={<Reservation />} />
               <Route path="/reservation/completed" element={<ReservationCompleted />} />
+              <Route path="/login" element={<LoginPage />} />
           </Routes>
       </>
   );

@@ -1,0 +1,74 @@
+.Login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    height: 90vh; 
+    /* background-color: #f9f9f9; */
+    margin: 0; 
+}
+
+.Login-container h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+.Login-input-area {
+    display: flex;
+    flex-direction: column;
+    width: 100%; 
+    max-width: 400px; 
+    margin-bottom: 20px;
+}
+
+.Login-input-area label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #000;
+    text-align: left;
+}
+
+.Login-input-area input {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px; 
+    outline: none;
+    width: 100%; 
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1); 
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.Login-input-area input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.5); 
+}
+
+.Login-button {
+    background-color: #F5F5F5;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 0;
+    width: 100%;
+    max-width: 400px; 
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 20px;
+}
+  
+.Login-button:hover {
+    background-color: #c6ced7; 
+    color: white;
+    transform: translateY(-2px); 
+}
+  
+.Login-button:active {
+    background-color: #003d80; 
+    transform: translateY(0);
+}

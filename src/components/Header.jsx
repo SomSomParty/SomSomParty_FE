@@ -24,7 +24,12 @@ const Header = () => {
                 <span>Somsom Party</span>
             </div>
             <div className = "auth-buttons">
-                <button className = "login-button">로그인</button>
+                <button 
+                    className = "login-button"
+                    onClick= {() => navigate('/login')}
+                >
+                    로그인
+                </button>
                 <button className = "logout-button">로그아웃</button>
                 <button
                     className = "mypage-button"
