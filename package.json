@@ -8,6 +8,8 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.9",
     "axois": "^0.0.1-security",
+    "dotenv": "^16.4.7",
+    "firebase": "^11.1.0",
     "http-proxy-middleware": "^3.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
