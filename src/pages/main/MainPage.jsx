@@ -1,22 +1,81 @@
 import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import CardList from '../../components/CardList';
 import '../../styles/CardList.css';
 import '../../styles/main/MainPage.css';
-import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [lastId, setLastId] = useState(0);
+    const [limit] = useState(8);
+    const [hasMore, setHasMore] = useState(true);
 
-    // 임의의 이벤트 목록
-    const mockEvents = [
-        { id: 1, name: '태안 빛축제', date: '2024-12-31', organizer: '충청남도 태안군' },
-        { id: 4, name: '낭만등불축제', date: '2025-04-30', organizer: '경기도 남양주시' },
-        { id: 4, name: '안산별빛마을 애니멀 & 하트빌리지 빛축제', date: '2024-12-31', organizer: '경기도 안산시' },
-        { id: 5, name: '무주반딧불축제', date: '2024-09-08', organizer: '전북특졀자치도 무주군' },
-        { id: 5, name: '마노르블랑 핑크뮬리축제', date: '2024-11-30', organizer: '제주도 서귀포시' }
-    ];
+    // 축제 목록 가져오기
+    const fetchFestivalList = async () => {
+        setError(null);
+        if (!hasMore) return;
+
+        try {
+            const endpoint = searchQuery.trim() ? '/api/festivals/search' : '/api/festivals'; // 검색 여부 확인
+            const params = searchQuery.trim()
+                ? { lastId, limit: limit, keyword: searchQuery }
+                : { lastId, limit: limit };
+
+            const response = await axios.get(endpoint, { params });
+            const { festivals, hasNext } = response.data;
+            setEvents(prevEvents => [
+                ...prevEvents,
+                ...festivals.map(festival => ({
+                    id: festival.id,
+                    name: festival.name,
+                    startDate: festival.startDate.replace(/-/g, '.'),
+                    endDate: festival.endDate.replace(/-/g, '.'),
+                })),
+            ]);
+            setLastId(response.data.lastId != null ? response.data.lastId : festivals[festivals.length - 1].id);
+            setHasMore(hasNext);
+        } catch (err) {
+            setError('축제 목록을 불러오는 중 문제가 발생했습니다.');
+        }
+    };
+
+    // 검색 API 호출
+    const fetchSearchResults = async () => {
+        setError(null);
+        if (!searchQuery.trim()) {
+            setLastId(0);
+            setHasMore(true);
+            setEvents([]); // 기존 데이터를 초기화
+            fetchFestivalList(); // 검색어가 비어있다면 기본 축제 목록 로드
+            return;
+        }
+
+        try {
+            const response = await axios.get('/api/festivals/search', {
+                params: { lastId: 0, limit: limit, keyword: searchQuery },
+            });
+            const { festivals, hasNext } = response.data;
+            setEvents(
+                festivals.map(festival => ({
+                    id: festival.id,
+                    name: festival.name,
+                    startDate: festival.startDate.replace(/-/g, '.'),
+                    endDate: festival.endDate.replace(/-/g, '.'),
+                }))
+            );
+            setLastId(response.data.lastId != null ? response.data.lastId : festivals[festivals.length - 1].id);
+            setHasMore(hasNext);
+        } catch (err) {
+            setError('검색 결과를 불러오는 중 문제가 발생했습니다.');
+        }
+    };
+
+    // 페이지 로드 시 초기 축제 목록 가져오기
+    useEffect(() => {
+        fetchFestivalList();
+    }, []);
 
     // 검색어 입력 시 상태 업데이트
     const handleSearchChange = (e) => {
@@ -26,30 +85,14 @@ const MainPage = () => {
     // 엔터 키를 눌렀을 때 검색 결과 가져오기
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            filterEvents();
+            fetchSearchResults();
         }
-    };
-
-    // 검색어에 맞는 이벤트 필터링
-    const filterEvents = () => {
-        const filteredEvents = mockEvents.filter(event =>
-            event.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setEvents(filteredEvents);
     };
 
     // 검색 버튼 클릭 시 결과 가져오기
     const handleSearchClick = () => {
-        filterEvents();
+        fetchSearchResults();
     };
-
-    // 검색어에 따라 이벤트 필터링
-    useEffect(() => {
-        if (searchQuery === '') {
-            setEvents(mockEvents); // 검색어가 비어 있으면 모든 이벤트를 표시
-        }
-    }, [searchQuery]);
-
 
     return (
         <div className = "main">
@@ -66,8 +109,13 @@ const MainPage = () => {
                     <img src = "/searchIcon.png" alt = "Search" className = "search-icon" />
                 </button>
             </div>
-            {loading && <p>검색 결과를 불러오고 있습니다.</p>}
             <CardList events = {events} />
+            {hasMore && events.length > 0 && (
+                <button className="more-button" onClick={fetchFestivalList}>
+                    더 보기
+                </button>
+            )}
+            {error && <div className="error-message">{error}</div>}
         </div>
     );
 };

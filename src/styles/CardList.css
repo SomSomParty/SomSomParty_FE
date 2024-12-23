@@ -4,7 +4,7 @@
     gap: 40px ;  /* 카드 간 간격 */
     padding: 2px;
     max-width: 1200px; /* 전체 카드 리스트의 최대 너비 설정 */
-    margin: 0 auto;
+    margin-bottom: 30px;
 }
 
 .card {
@@ -41,9 +41,4 @@
     font-size: 18px;
     font-weight: bold;
     margin: 8px 0;
-}
-
-.event-organizer {
-    font-size: 14px;
-    color: #555;
 }
