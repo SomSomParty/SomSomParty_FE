@@ -1,25 +1,24 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-const ReservationInfo = ({ selectedDate, maxCapacity }) => {
-  const [number, setNumber] = useState(1);
+const ReservationInfo = ({ festivalId, selectedDate }) => {
   const navigate = useNavigate();
+  console.log(festivalId);
 
-  const handleMinus = () => {
-    if (number > 1) {
-      setNumber(number - 1);
+  const handleNext = async () => {
+    // 로그인 시 이메일 하드 코딩 변경 예정
+    try {
+      const apiResponse = await axios.post("/api/reservations", {
+        userId: 1,
+        festivalId: festivalId,
+        festivalDate: selectedDate
+      });
+      navigate("/reservation/completed");
+    } catch (error) {
+      alert(error.response.data.message);
     }
-  };
-
-  const handlePlus = () => {
-    if (number < maxCapacity) {
-      setNumber(number + 1);
-    }
-  };
-
-  const handleNext = () => {
-    navigate("/reservation/completed");
   };
 
   return (
@@ -30,19 +29,9 @@ const ReservationInfo = ({ selectedDate, maxCapacity }) => {
           <RectangleWrapper>
             <Rectangle />
             <DateText x="20" y="33">
-              {selectedDate}
+              {selectedDate ? selectedDate : "날짜를 선택하세요"}
             </DateText>
           </RectangleWrapper>
-
-          <MaxText>최대 예약 가능 인원: {maxCapacity}</MaxText>
-          <SelectContainer>
-            <SelectText>인원을 선택하세요.</SelectText>
-            <CounterWrapper>
-              <Minus onClick={handleMinus}>-</Minus>
-              <Number>{number}</Number>
-              <Plus onClick={handlePlus}>+</Plus>
-            </CounterWrapper>
-          </SelectContainer>
         </ContentWrapper>
         <NextText onClick={handleNext}>다음</NextText>
       </ReservationContainer>
@@ -98,53 +87,6 @@ const Rectangle = styled.rect`
 const DateText = styled.text`
   font-size: 25px;
   font-weight: 400;
-`;
-
-const SelectContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const SelectText = styled.div`
-  font-size: 28px;
-  font-weight: 500;
-  text-align: left;
-`;
-
-const CounterWrapper = styled.div`
-  display: flex;
-  background-color: white;
-  & > * {
-    margin: 0;
-    padding: 5px 15px; /* 필요한 padding 값 */
-    box-sizing: border-box;
-    border: 1px solid #cfcfcf;
-  }
-`;
-
-const Minus = styled.p`
-  font-size: 30px;
-  font-weight: 500;
-  cursor: pointer;
-`;
-
-const Plus = styled.p`
-  font-size: 30px;
-  font-weight: 500;
-  cursor: pointer;
-`;
-
-const Number = styled.p`
-  font-size: 30px;
-  font-weight: 500;
-  width: 50px;
-`;
-
-const MaxText = styled.div`
-  font-size: 28px;
-  font-weight: 500;
-  text-align: left;
 `;
 
 const NextText = styled.div`
