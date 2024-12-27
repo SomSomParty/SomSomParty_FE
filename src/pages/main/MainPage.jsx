@@ -115,7 +115,6 @@ const MainPage = () => {
                     더 보기
                 </button>
             )}
-            {error && <div className="error-message">{error}</div>}
         </div>
     );
 };

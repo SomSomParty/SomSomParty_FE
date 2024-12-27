@@ -64,7 +64,6 @@ const MyPage = () => {
             ) : (
                 <p>예약 내역이 없습니다.</p>
             )}
-            {error && <div className="error-message">{error}</div>}
         </div>
     );
 };
