@@ -25,7 +25,7 @@ function SignUpPage() {
 
   const handleSignup = async () => {
     const { name, email, password } = formData;
-    const apiUrl = '/signup';
+    const apiUrl = '/api/signup';
 
     try {
       console.log("회원가입 요청 데이터:", formData);
@@ -47,7 +47,7 @@ function SignUpPage() {
   };
 
   const handleVerify = async () => {
-    const apiUrl = '/confirm-signup';
+    const apiUrl = '/api/confirm-signup';
     const { name, email } = formData;
 
     try {

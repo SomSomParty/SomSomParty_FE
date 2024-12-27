@@ -20,7 +20,7 @@ function SignInPage() {
 
   const handleLogin = async () => {
     const { email, password } = formData;
-    const apiUrl = '/login'; 
+    const apiUrl = '/api/login'; 
 
     try {
       console.log("로그인 요청 데이터:", formData);

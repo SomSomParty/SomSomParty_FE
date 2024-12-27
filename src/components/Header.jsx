@@ -21,7 +21,7 @@ const Header = () => {
     };
 
     const handleLogout = async () => {
-        const apiUrl = '/signout'; 
+        const apiUrl = '/api/signout'; 
 
         try {
             console.log("로그아웃 요청 전송");
