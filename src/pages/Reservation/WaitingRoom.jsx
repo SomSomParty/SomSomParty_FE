@@ -53,6 +53,7 @@ const WaitingRoom = () => {
   // 대기열에서 유저를 제거하는 함수
   const handleLeaveQueue = async () => {
     try {
+      // 로그인 시 이메일 하드 코딩 변경 예정
       const email = "user10@example.com";
       await axios.delete(
         `/api/queues/festival${festivalId}/users/${email}/leave`
@@ -65,6 +66,7 @@ const WaitingRoom = () => {
 
   const registerWaitingRoom = async () => {
     try {
+      // 로그인 시 이메일 하드 코딩 변경 예정
       const email = "user10@example.com";
       const response = await axios.get(
         `/api/queues/festival${festivalId}/waiting-room/users/${email}`
@@ -78,7 +80,7 @@ const WaitingRoom = () => {
 
   const fetchUserRank = async () => {
     try {
-      // 유저 임시 설정(로그인 구현 X)
+      // 로그인 시 이메일 하드 코딩 변경 예정
       const email = "user10@example.com";
       const response = await axios.get(
         `/api/queues/festival${festivalId}/users/${email}/rank`
