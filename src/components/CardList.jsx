@@ -1,17 +1,17 @@
 import React from 'react';
 import '../styles/CardList.css';
 
-const Card = ({ name, date, organizer }) => {
+const Card = ({ name, startDate, endDate }) => {
     return (
         <div className = "card">
             <div className = "card-image">
                 {/*<img src = "image_url" alt = "image description" />*/}
-                <span>사진</span>
+                {/*<span>사진</span>*/}
             </div>
             <div className = "card-content">
-                <p className = "event-date">{date}</p>
+                <span className = "event-date">{startDate}  ~  </span>
+                <span className = "event-date">{endDate}</span>
                 <p className = "event-name">{name}</p>
-                <p className = "event-organizer">{organizer}</p>
             </div>
         </div>
     );
@@ -25,8 +25,8 @@ const CardList = ({ events }) => {
                     <Card
                         key = {index}
                         name = {event.name}
-                        date = {event.date}
-                        organizer = {event.organizer}
+                        startDate = {event.startDate}
+                        endDate = {event.endDate}
                     />
                 ))
             ) : (
