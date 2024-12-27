@@ -1,9 +1,9 @@
-import axios from "./axiosConfig";
+import axios from "axios";
 
 // 채팅방 참여 API
 export const joinChatRoom = async (chatRoomId, userId) => {
   try {
-    const response = await axios.post(`/chatting/${chatRoomId}/join`, {}, {
+    const response = await axios.post(`/api/festivals/chatting/${chatRoomId}/join`, {}, {
       params: { userId },
     });
     return response.data; // 반환된 chatRoomId
@@ -16,7 +16,7 @@ export const joinChatRoom = async (chatRoomId, userId) => {
 // 채팅방 진입 API
 export const enterChatRoom = async (chatRoomId, userId, lastEvaluatedSendTime = null) => {
   try {
-    const response = await axios.get(`/chatting/${chatRoomId}`, {
+    const response = await axios.get(`/api/festivals/chatting/${chatRoomId}`, {
       params: {
         userId,
         lastEvaluatedSendTime, // 서버로부터 받은 값을 전달
