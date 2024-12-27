@@ -24,7 +24,7 @@ const App = () => {
               <Route path="/mypage" element={<MyPage />} />
               <Route path="/reservation/:festivalId" element={<Reservation />} />
               <Route path="/reservation/completed" element={<ReservationCompleted />} />
-              <Route path="/festival" element={<FestivalPage />} />
+              <Route path="/festival-detail/:id" element={<FestivalPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/chat-room" element={<ChatRoom />} />
               <Route path="/waiting-room/:festivalId" element={<WaitingRoom />} />

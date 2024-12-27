@@ -1,9 +1,9 @@
 import React from 'react';
 import '../styles/CardList.css';
 
-const Card = ({ name, startDate, endDate, reservationDate, festivalDate }) => {
+const Card = ({ id, name, startDate, endDate, reservationDate, festivalDate, onEventClick }) => {
     return (
-        <div className = "card">
+        <div className="card" onClick={() => onEventClick(id)}>
             <div className = "card-image">
                 {/*<img src = "image_url" alt = "image description" />*/}
                 {/*<span>사진</span>*/}
@@ -27,18 +27,22 @@ const Card = ({ name, startDate, endDate, reservationDate, festivalDate }) => {
 };
 
 const CardList = ({ events, onEventClick }) => {
+    console.log('CardList received onEventClick:', onEventClick);
     return (
         <div className="card-list">
             {events && events.length > 0 ? (
                 events.map((event) => (
-                    <Card
-                        key = {index}
-                        name = {event.name}
-                        startDate = {event.startDate}
-                        endDate = {event.endDate}
-                        reservationDate = {event.reservationDate}
-                        festivalDate = {event.festivalDate}
-                    />
+                    <div key={event.id}>
+                        <Card
+                            id={event.id}
+                            name={event.name}
+                            startDate={event.startDate}
+                            endDate={event.endDate}
+                            reservationDate={event.reservationDate}
+                            festivalDate={event.festivalDate}
+                            onEventClick={onEventClick} // onEventClick 전달
+                        />
+                    </div>
                 ))
             ) : (
                 <p>결과가 없습니다.</p>
@@ -46,5 +50,6 @@ const CardList = ({ events, onEventClick }) => {
         </div>
     );
 };
+
 
 export default CardList;
