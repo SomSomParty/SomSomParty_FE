@@ -1,15 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getChatRoomList } from "../../api/myChatListApi"; // API 함수 가져오기
 import "./ChatPage.css";
 
-const chats = [
-  { id: 1, title: "동덕여대 축제 공지 방", notifications: 3, participants: "5명" },
-  { id: 2, title: "동덕여대 축제 동반인 모집 방", notifications: 2, participants: "2명" },
-  { id: 3, title: "여의도 불꽃 축제 같이 가요", notifications: 4, participants: "8명" },
-  { id: 4, title: "서힙페 같이 가요", notifications: 1, participants: "3명" },
-  { id: 5, title: "고대 축제 같이 다녀용", notifications: 8, participants: "6명" },
-];
-
 const ChatList = ({ onChatSelect }) => {
+  const [chats, setChats] = useState([]); // 채팅 목록 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const userId = 1; // TODO: 로그인 구현 완료시 하드코딩 제거
+
+  // 백엔드에서 채팅방 데이터 가져오기
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const chatRooms = await getChatRoomList(userId); // API 호출
+        setChats(chatRooms); // 데이터 저장
+      } catch (error) {
+        console.error("채팅방 데이터를 가져오는 중 에러 발생:", error);
+      } finally {
+        setLoading(false); // 로딩 완료
+      }
+    };
+
+    fetchChats();
+  }, [userId]);
+
+  if (loading) {
+    return <p>채팅방 데이터를 불러오는 중...</p>;
+  }
+
   return (
     <div className="chat-search-container">
       <input
@@ -26,14 +43,11 @@ const ChatList = ({ onChatSelect }) => {
           >
             <div className="chat-item-details">
               <span className="chat-item-title">{chat.title}</span>
-              {chat.notifications > 0 && (
-                <span className="chat-item-notifications">
-                  {chat.notifications}
-                </span>
-              )}
+              {/* TODO: 알림 갯수 구현 후 표시 */}
+              {/* <span className="chat-item-notifications">알림 수</span> */}
             </div>
             <span className="chat-item-participants">
-              {chat.participants}
+              {chat.userCount}명
             </span>
           </li>
         ))}
