@@ -1,45 +1,132 @@
-import React from "react";
-import { useLocation } from "react-router-dom"; // useLocation 추가
+import React, { useState, useEffect, useRef } from "react";
 import "./ChatRoom.css";
+import { getChatMessages } from "../../api/chatApi"; // 메시지 가져오는 API 호출 함수
 
-const mockEvents = [
-  { id: 1, title: "태안 빛축제 채팅방", description: "태안 빛축제에 대한 채팅방입니다." },
-  { id: 4, title: "낭만등불축제 채팅방", description: "낭만등불축제 채팅방입니다." },
-  { id: 5, title: "무주반딧불축제 채팅방", description: "무주반딧불축제에 대한 채팅방입니다." },
-];
+const ChatRoom = ({ chat, messages: initialMessages }) => {
+  const userId = 1; // 하드코딩된 사용자 ID
+  const [messages, setMessages] = useState([]);
+  const [lastEvaluatedSendTime, setLastEvaluatedSendTime] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
-const ChatRoom = () => {
-  const location = useLocation();
+  // 시간 형식 변환 함수
+  const formatTime = (epochSeconds) => {
+    const date = new Date(epochSeconds * 1000);
+    return date.toLocaleString("ko-KR", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
-  // URL에서 `id` 쿼리 파라미터 추출
-  const searchParams = new URLSearchParams(location.search);
-  const chatRoomId = parseInt(searchParams.get("id"), 10); // 숫자로 변환
+  // 메시지 초기화 및 시간순 정렬
+  useEffect(() => {
+    if (Array.isArray(initialMessages)) {
+      const formattedMessages = initialMessages
+        .map((message) => ({
+          ...message,
+          isMyMessage: message.senderId === userId,
+        }))
+        .sort((a, b) => a.sendTime - b.sendTime); // 시간순 정렬
+      setMessages(formattedMessages);
 
-  // mockEvents에서 해당 `id`에 맞는 데이터 찾기
-  const chat = mockEvents.find((room) => room.id === chatRoomId);
+      if (initialMessages.length > 0) {
+        setLastEvaluatedSendTime(
+          initialMessages[initialMessages.length - 1].sendTime
+        );
+      }
+    }
+  }, [initialMessages]);
+
+  // 스크롤을 항상 최신 메시지에 고정
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+// 이전 메시지 로드
+// 이전 메시지 로드
+const loadPreviousMessages = async () => {
+  if (loading || !lastEvaluatedSendTime) return; // 이미 로딩 중이거나 더 가져올 메시지가 없으면 종료
+  setLoading(true);
+
+  // 현재 스크롤 위치 저장
+  const currentScrollHeight = messagesContainerRef.current.scrollHeight;
+  const currentScrollTop = messagesContainerRef.current.scrollTop;
+
+  try {
+    const previousMessages = await getChatMessages(
+      chat.id,
+      lastEvaluatedSendTime,
+      userId // userId를 전달
+    );
+    if (previousMessages.messages?.length > 0) {
+      const formattedMessages = previousMessages.messages.map((message) => ({
+        ...message,
+        isMyMessage: message.senderId === userId,
+      }));
+      setMessages((prev) => [...formattedMessages, ...prev]); // 이전 메시지를 앞에 추가
+      setLastEvaluatedSendTime(previousMessages.lastEvaluatedSendTime);
+
+      // 메시지 추가 후 스크롤 위치 복원
+      setTimeout(() => {
+        const newScrollHeight = messagesContainerRef.current.scrollHeight;
+        messagesContainerRef.current.scrollTop =
+          newScrollHeight - currentScrollHeight + currentScrollTop;
+      }, 0); // DOM 업데이트 후 스크롤 위치 복원
+    }
+  } catch (error) {
+    console.error("이전 메시지를 가져오는 중 오류:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // 스크롤 이벤트 핸들러
+  const handleScroll = () => {
+    if (messagesContainerRef.current.scrollTop === 0) {
+      loadPreviousMessages();
+    }
+  };
+
+  const [newMessage, setNewMessage] = useState("");
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+
+    const newMessageData = {
+      senderName: "나",
+      content: newMessage,
+      isMyMessage: true,
+      sendTime: Math.floor(Date.now() / 1000),
+    };
+
+    setMessages((prev) => [...prev, newMessageData]);
+    setNewMessage("");
+  };
 
   if (!chat) {
-    return <p>해당 채팅방을 찾을 수 없습니다.</p>; // 유효하지 않은 `id` 처리
+    return <div className="placeholder">채팅방을 선택하세요.</div>;
   }
-
-  // 메시지 데이터에 isMyMessage 속성 추가
-  const messages = [
-    { id: 1, sender: "관리자", content: "공지: 다음 주 모임 일정 안내", isMyMessage: false },
-    { id: 2, sender: "유저2", content: "참석 가능합니다!", isMyMessage: false },
-    { id: 3, sender: "나", content: "저도 가능합니다.", isMyMessage: true },
-  ];
 
   return (
     <div className="chat-room-container">
       <div className="chat-room-header">{chat.title}</div>
-      <div className="chat-room-messages">
-        {messages.map((message) => (
+      <div
+        className="chat-room-messages"
+        onScroll={handleScroll}
+        ref={messagesContainerRef}
+      >
+        {messages.map((message, index) => (
           <div
-            key={message.id}
-            className={`chat-message ${message.isMyMessage ? "my-message" : "other-message"}`}
+            key={index}
+            className={`chat-message ${
+              message.isMyMessage ? "my-message" : "other-message"
+            }`}
           >
             {!message.isMyMessage && (
-              <span className="chat-message-sender">{message.sender}</span>
+              <span className="chat-message-sender">{message.senderName}</span>
             )}
             <div
               className={`chat-message-content ${
@@ -47,17 +134,27 @@ const ChatRoom = () => {
               }`}
             >
               {message.content}
+              <span className="message-time">
+                {formatTime(message.sendTime)}
+              </span>
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <div className="chat-input-container">
         <input
           type="text"
           className="chat-input"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
           placeholder="메시지를 입력하세요"
         />
-        <button className="send-button">전송</button>
+        <button className="send-button" onClick={handleSendMessage}>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+          </svg>
+        </button>
       </div>
     </div>
   );
