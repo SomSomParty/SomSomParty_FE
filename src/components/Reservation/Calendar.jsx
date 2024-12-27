@@ -7,11 +7,12 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
   const [dates, setDates] = useState([]);
 
   const handleDateClick = (day) => {
-    const selectedFullDate = new Date(currentYear, currentMonth, day, 12).toISOString().split("T")[0]; 
+    const selectedFullDate = new Date(currentYear, currentMonth, day, 12)
+      .toISOString()
+      .split("T")[0];
     console.log(selectedFullDate);
     onDateSelect(selectedFullDate);
-};
-
+  };
 
   // 연도와 월에 따른 날짜 계산
   useEffect(() => {
@@ -26,7 +27,11 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
       // 이전 달 날짜
       for (let i = startDay - 1; i >= 0; i--) {
         const prevMonthDate = new Date(year, month, -i);
-        datesArray.push({ date: prevMonthDate.getDate(), isCurrentMonth: false, fullDate: prevMonthDate });
+        datesArray.push({
+          date: prevMonthDate.getDate(),
+          isCurrentMonth: false,
+          fullDate: prevMonthDate,
+        });
       }
 
       // 이번 달 날짜
@@ -40,7 +45,11 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
       const remainingDays = 42 - totalDays; // 캘린더 최대 6주(42일)
       for (let i = 1; i <= remainingDays; i++) {
         const nextMonthDate = new Date(year, month + 1, i);
-        datesArray.push({ date: i, isCurrentMonth: false, fullDate: nextMonthDate });
+        datesArray.push({
+          date: i,
+          isCurrentMonth: false,
+          fullDate: nextMonthDate,
+        });
       }
 
       return datesArray;
@@ -53,7 +62,10 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
   const handlePrevMonth = () => {
     const prevMonth = new Date(currentYear, currentMonth - 1);
 
-    if (startDate && new Date(currentYear, currentMonth, 1) <= new Date(startDate)) {
+    if (
+      startDate &&
+      new Date(currentYear, currentMonth, 1) <= new Date(startDate)
+    ) {
       return;
     }
 
@@ -65,7 +77,10 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
   const handleNextMonth = () => {
     const nextMonth = new Date(currentYear, currentMonth + 1);
 
-    if (endDate && new Date(currentYear, currentMonth + 1) > new Date(endDate)) {
+    if (
+      endDate &&
+      new Date(currentYear, currentMonth + 1) > new Date(endDate)
+    ) {
       return;
     }
 
@@ -73,8 +88,10 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
     setCurrentYear(nextMonth.getFullYear());
   };
 
-  const shouldShowPrevButton = new Date(currentYear, currentMonth, 1) >= new Date(startDate);
-  const shouldShowNextButton = new Date(currentYear, currentMonth, 1) <= new Date(endDate);
+  const shouldShowPrevButton =
+    new Date(currentYear, currentMonth, 1) >= new Date(startDate);
+  const shouldShowNextButton =
+    new Date(currentYear, currentMonth, 1) <= new Date(endDate);
 
   const isWithinRange = (fullDate) => {
     const start = new Date(startDate).setHours(0, 0, 0, 0);
@@ -85,20 +102,26 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
   return (
     <Container>
       <Header>
-          <PrevButton onClick={handlePrevMonth} shouldShow={shouldShowPrevButton}>{'<'}</PrevButton>
-          <MonthLabel>{currentYear}년 {currentMonth + 1}월</MonthLabel>
-          <NextButton onClick={handleNextMonth} shouldShow={shouldShowNextButton}>{'>'}</NextButton>
+        <PrevButton onClick={handlePrevMonth} shouldShow={shouldShowPrevButton}>
+          {"<"}
+        </PrevButton>
+        <MonthLabel>
+          {currentYear}년 {currentMonth + 1}월
+        </MonthLabel>
+        <NextButton onClick={handleNextMonth} shouldShow={shouldShowNextButton}>
+          {">"}
+        </NextButton>
       </Header>
 
       <Dates>
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
           <Day key={day}>{day}</Day>
         ))}
-        {dates.map((item, index) => (
+        {dates.map((item, index) =>
           item.isCurrentMonth ? (
             <Day
               key={index}
-              onClick={() => handleDateClick(item.date)}
+              onClick={isWithinRange(item.fullDate) ? () => handleDateClick(item.date) : undefined}
               isWithinRange={isWithinRange(item.fullDate)}
             >
               {item.date}
@@ -106,7 +129,7 @@ const Calendar = ({ onDateSelect, startDate, endDate }) => {
           ) : (
             <PrevMonth key={index}>{item.date}</PrevMonth>
           )
-        ))}
+        )}
       </Dates>
     </Container>
   );
@@ -130,22 +153,22 @@ const Header = styled.div`
   margin-bottom: 20px;
 `;
 
-const MonthLabel = styled.span`
-  flex-grow: 1;
-  text-align: center;
-  font-size: 20px;
-`;
-
 const PrevButton = styled.button`
-  display: ${({ shouldShow }) => (shouldShow ? 'inline' : 'none')};
+  display: ${({ shouldShow }) => (shouldShow ? "inline" : "none")};
   font-size: 24px;
   background-color: transparent;
   border: none;
   cursor: pointer;
 `;
 
+const MonthLabel = styled.span`
+  flex-grow: 1;
+  text-align: center;
+  font-size: 20px;
+`;
+
 const NextButton = styled.button`
-  display: ${({ shouldShow }) => (shouldShow ? 'inline' : 'none')};
+  display: ${({ shouldShow }) => (shouldShow ? "inline" : "none")};
   font-size: 24px;
   background-color: transparent;
   border: none;
@@ -162,8 +185,10 @@ const Dates = styled.div`
 const Day = styled.div`
   font-size: 18px;
   text-align: center;
+  cursor: ${({ isWithinRange }) => (isWithinRange ? "pointer" : "not-allowed")};
   color: ${({ isWithinRange }) => (isWithinRange ? "#000" : "#6e7781")};
-  background-color: ${({ isWithinRange }) => (isWithinRange ? "#E0E0E0" : "transparent")};
+  background-color: ${({ isWithinRange }) =>
+    isWithinRange ? "#E0E0E0" : "transparent"};
   flex: 1;
   padding: 10px;
   height: 60px;
@@ -171,13 +196,13 @@ const Day = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border: 1px solid #CFCFCF;
+  border: 1px solid #cfcfcf;
   border-right: none;
   border-bottom: none;
 `;
 
 const PrevMonth = styled(Day)`
   opacity: 0.5;
-  background: #F0F0F0;
+  background: #f0f0f0;
   cursor: default;
 `;
