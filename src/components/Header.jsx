@@ -21,11 +21,6 @@ const Header = () => {
     };
 
     const handleLogout = async () => {
-        if (!accessToken) {
-            alert("로그인을 진행해주세요.");
-            return;
-        }
-
         const apiUrl = '/signout'; 
 
         try {
@@ -39,12 +34,10 @@ const Header = () => {
 
             console.log("로그아웃 성공");
 
-            // 전역 상태 초기화
             setAccessToken("");
             setRefreshToken("");
             setUserName("");
 
-            // 로그인 페이지로 이동
             alert("로그아웃되었습니다.");
             navigate('/');
         } catch (err) {
@@ -54,38 +47,46 @@ const Header = () => {
     };
 
     return (
-        <header className = "header">
+        <header className="header">
             <div
-                className = "logo"
-                onClick = {handleLogoClick}
+                className="logo"
+                onClick={handleLogoClick}
             >
                 <span>Somsom Party</span>
             </div>
-            <div className = "auth-buttons">
-                <button 
-                    className="signup-button"
-                    onClick = {() => navigate('/signup')}
-                >
-                    회원가입
-                </button>
-                <button 
-                    className = "login-button"
-                    onClick= {() => navigate('/signin')}
-                >
-                    로그인
-                </button>
-                <button 
-                    className = "logout-button"
-                    onClick={handleLogout} 
-                >
-                    로그아웃
-                </button>
-                <button
-                    className = "mypage-button"
-                    onClick = {() => navigate('/mypage')}
-                >
-                    마이페이지
-                </button>
+            <div className="auth-buttons">
+                {!accessToken && ( // 로그인하지 않은 상태
+                    <>
+                        <button
+                            className="signup-button"
+                            onClick={() => navigate('/signup')}
+                        >
+                            회원가입
+                        </button>
+                        <button
+                            className="login-button"
+                            onClick={() => navigate('/signin')}
+                        >
+                            로그인
+                        </button>
+                    </>
+                )}
+                {accessToken && ( // 로그인한 상태
+                    <>
+                        <button
+                            className="logout-button"
+                            onClick={handleLogout}
+                        >
+                            로그아웃
+                        </button>
+                        <button
+                            className="mypage-button"
+                            onClick={() => navigate('/mypage')}
+                        >
+                            마이페이지
+                        </button>
+                    </>
+                )}
             </div>
         </header>
     );
