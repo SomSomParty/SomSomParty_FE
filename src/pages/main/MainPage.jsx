@@ -8,6 +8,7 @@ const MainPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     // 임의의 이벤트 목록
     const mockEvents = [
@@ -50,6 +51,10 @@ const MainPage = () => {
         }
     }, [searchQuery]);
 
+    const handleEventClick = (eventId) => {
+        navigate(`/festival?id=${eventId}`); // id를 쿼리 파라미터로 전달
+    };
+
 
     return (
         <div className = "main">
@@ -67,7 +72,7 @@ const MainPage = () => {
                 </button>
             </div>
             {loading && <p>검색 결과를 불러오고 있습니다.</p>}
-            <CardList events = {events} />
+            <CardList events={events} onEventClick={handleEventClick} />
         </div>
     );
 };

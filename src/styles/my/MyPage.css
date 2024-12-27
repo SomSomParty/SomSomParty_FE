@@ -1,15 +1,27 @@
-.my-page-container {
+.my-page-header {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 50px;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    align-items: center; /* 세로 정렬 */
+    gap: 50px; /* 두 텍스트 간의 적절한 간격 */
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 40px;
+    padding-left: 20px; /* 왼쪽 여백 추가 */
+    margin-left: 235px; /* 카드 리스트와 맞추기 위해 왼쪽 간격 추가 */
+    padding-top: 10px; /* 위쪽 여백 추가 */
 }
 
-.my-page-title {
+.my-page-title, .my-page-link {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 40px;
-    text-align: left;
-    width: 100%;
-    margin-left: 820px;
+    margin: 0;
+    color: black;
+}
+
+.my-page-link {
+    cursor: pointer;
+}
+
+.my-page-link:hover {
+    text-decoration: underline;
 }
