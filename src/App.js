@@ -7,6 +7,7 @@ import Reservation from "./pages/Reservation/Reservation"
 import ReservationCompleted from './pages/Reservation/ReservationCompleted';
 import FestivalPage from './pages/Festival/FestivalDetail/FestivalPage';
 import ChatPage from './pages/Chat/ChatPage';
+import ChatRoom from './pages/Chat/ChatRoom';
 
 
 
@@ -26,6 +27,7 @@ const App = () => {
               <Route path="/reservation/completed" element={<ReservationCompleted />} />
               <Route path="/festival" element={<FestivalPage />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/chat-room" element={<ChatRoom />} />
           </Routes>
       </>
   );
