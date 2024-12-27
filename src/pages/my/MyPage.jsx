@@ -34,7 +34,7 @@ const MyPage = () => {
                     id: reservation.id,
                     name: reservation.festivalInfo.name,
                     reservationDate: reservation.reservationDate,
-                    // festivalDate: reservation.festivalDate
+                    festivalDate: reservation.festivalDate
                 })),
             ]);
 
