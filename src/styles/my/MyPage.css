@@ -14,14 +14,7 @@
 .my-page-title, .my-page-link {
     font-size: 24px;
     font-weight: bold;
-    margin: 0;
-    color: black;
-}
-
-.my-page-link {
-    cursor: pointer;
-}
-
-.my-page-link:hover {
-    text-decoration: underline;
+    margin-bottom: 40px;
+    align-self: start;
+    margin-left: 410px;
 }
