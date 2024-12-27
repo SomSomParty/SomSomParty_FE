@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/CardList.css';
 
-const Card = ({ name, startDate, endDate }) => {
+const Card = ({ name, startDate, endDate, reservationDate, festivalDate }) => {
     return (
         <div className = "card">
             <div className = "card-image">
@@ -9,8 +9,17 @@ const Card = ({ name, startDate, endDate }) => {
                 {/*<span>사진</span>*/}
             </div>
             <div className = "card-content">
-                <span className = "event-date">{startDate}  ~  </span>
-                <span className = "event-date">{endDate}</span>
+                {startDate && endDate ? (
+                    <>
+                        <span className="event-date">{startDate} ~ </span>
+                        <span className="event-date">{endDate}</span>
+                    </>
+                ) : (
+                    <>
+                        <span className="event-date">축제일: {festivalDate}</span><br/>
+                        <span className="event-date">예매일: {reservationDate}</span>
+                    </>
+                )}
                 <p className = "event-name">{name}</p>
             </div>
         </div>
@@ -27,6 +36,8 @@ const CardList = ({ events }) => {
                         name = {event.name}
                         startDate = {event.startDate}
                         endDate = {event.endDate}
+                        reservationDate = {event.reservationDate}
+                        festivalDate = {event.festivalDate}
                     />
                 ))
             ) : (
