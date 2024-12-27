@@ -1,16 +1,17 @@
 import React from 'react';
 import '../styles/CardList.css';
 
-const Card = ({ name, date, organizer, onClick }) => {
+const Card = ({ name, startDate, endDate }) => {
     return (
-        <div className="card" onClick={onClick}> {/* 클릭 이벤트 추가 */}
-            <div className="card-image">
-                <span>사진</span>
+        <div className = "card">
+            <div className = "card-image">
+                {/*<img src = "image_url" alt = "image description" />*/}
+                {/*<span>사진</span>*/}
             </div>
-            <div className="card-content">
-                <p className="event-date">{date}</p>
-                <p className="event-name">{name}</p>
-                <p className="event-organizer">{organizer}</p>
+            <div className = "card-content">
+                <span className = "event-date">{startDate}  ~  </span>
+                <span className = "event-date">{endDate}</span>
+                <p className = "event-name">{name}</p>
             </div>
         </div>
     );
@@ -22,11 +23,10 @@ const CardList = ({ events, onEventClick }) => {
             {events && events.length > 0 ? (
                 events.map((event) => (
                     <Card
-                        key={event.id} // 각 이벤트의 고유 ID를 key로 사용
-                        name={event.name}
-                        date={event.date}
-                        organizer={event.organizer}
-                        onClick={() => onEventClick(event.id)} // 클릭 이벤트 처리
+                        key = {index}
+                        name = {event.name}
+                        startDate = {event.startDate}
+                        endDate = {event.endDate}
                     />
                 ))
             ) : (
