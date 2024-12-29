@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위한 us
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext'; // AuthContext import
 
+import { requestFirebaseToken } from '../../fireabse/firebaseConfig';
+
 function SignInPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState(""); // 로그인 실패 시 에러 메시지
   const [success, setSuccess] = useState(""); // 성공 메시지 관리
 
-  const { setAccessToken, setRefreshToken, setUserName } = useContext(AuthContext);
+  const { setAccessToken, setRefreshToken, setUserName, setFcmToken } = useContext(AuthContext);
 
   const navigate = useNavigate(); 
 
@@ -20,12 +22,12 @@ function SignInPage() {
 
   const handleLogin = async () => {
     const { email, password } = formData;
-    const apiUrl = '/api/login'; 
+    const signinUri = '/api/login'; 
 
     try {
       console.log("로그인 요청 데이터:", formData);
 
-      const response = await axios.post(apiUrl, {
+      const response = await axios.post(signinUri, {
         email, 
         password,
       });
@@ -43,6 +45,34 @@ function SignInPage() {
       setUserName(userName);
 
       alert('로그인되었습니다!'); 
+
+      // FCM 토큰 요청 및 서버로 전송
+      try {
+        const fcmToken = await requestFirebaseToken();
+        setFcmToken(fcmToken);
+        
+        if (fcmToken) {
+          console.log("푸시 토큰 전송 시작:", fcmToken);
+
+          await axios.post(
+            '/api/notification/activate',
+            { 
+              token: fcmToken, 
+              deviceType: 'WEB', 
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          console.log("푸시 토큰 활성화 완료");
+        }
+      } catch (tokenError) {
+        console.error("푸시 토큰 활성화 중 에러 발생:", tokenError.message);
+      }
+
       navigate('/');
     } catch (err) {
       console.error("로그인 실패:", err.response?.data || err.message);

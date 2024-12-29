@@ -14,13 +14,9 @@ import SignInPage from './pages/auth/SignInPage';
 import SignUpPage from './pages/auth/SignUpPage';
 
 import { AuthProvider } from './context/AuthContext';
-import { requestPermission } from './fireabse/firebaseConfig';
+// import { requestPermission } from './fireabse/firebaseConfig';
 
 const App = () => {
-  useEffect(() => {
-    requestPermission(); // 알림 권한 요청
-  }, []);
-
   return (
     <>
       <AuthProvider>
