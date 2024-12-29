@@ -6,6 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState("");
   const [refreshToken, setRefreshToken] = useState("");
   const [userName, setUserName] = useState("");
+  const [fcmToken, setFcmToken] = useState("");
 
   return (
     <AuthContext.Provider
@@ -16,6 +17,8 @@ export const AuthProvider = ({ children }) => {
         setRefreshToken,
         userName,
         setUserName,
+        fcmToken,
+        setFcmToken,
       }}
     >
       {children}
