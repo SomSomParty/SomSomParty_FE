@@ -5,7 +5,7 @@ import "./ChatPage.css";
 const ChatList = ({ onChatSelect }) => {
   const [chats, setChats] = useState([]); // 채팅방 목록 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
-  const userId = 1; // 하드코딩된 사용자 ID
+  const userId = 2; // 하드코딩된 사용자 ID
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -22,6 +22,16 @@ const ChatList = ({ onChatSelect }) => {
     fetchChats(); // 컴포넌트가 처음 렌더링될 때 채팅방 목록 가져오기
   }, []);
 
+  const handleChatClick = (chat) => {
+    // 클릭한 채팅방의 unreadCount를 0으로 업데이트
+    setChats((prevChats) =>
+      prevChats.map((c) =>
+        c.id === chat.id ? { ...c, unReadCount: 0 } : c
+      )
+    );
+    onChatSelect(chat); // 채팅방 선택 핸들러 호출
+  };
+
   if (loading) {
     return <p>채팅방 데이터를 불러오는 중...</p>;
   }
@@ -36,10 +46,17 @@ const ChatList = ({ onChatSelect }) => {
         <li
           key={chat.id}
           className="chat-item"
-          onClick={() => onChatSelect(chat)} // 채팅방 선택 핸들러
+          onClick={() => handleChatClick(chat)} // 클릭 핸들러
         >
-          <div className="chat-title">{chat.title}</div>
-          <div className="chat-participants">{chat.userCount}명</div>
+          {/* 왼쪽: 제목과 인원 */}
+          <div className="chat-item-left">
+            <div className="chat-item-title">{chat.title}</div>
+            <div className="chat-item-participants">{chat.userCount}명</div>
+          </div>
+          {/* 오른쪽: Unread Count */}
+          {chat.unReadCount > 0 && (
+            <div className="chat-unread">{chat.unReadCount}</div>
+          )}
         </li>
       ))}
     </ul>

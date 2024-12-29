@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ChatRoom.css";
 import { getChatMessages } from "../../api/chatApi"; // 메시지 가져오는 API 호출 함수
+import { Stomp } from "@stomp/stompjs";
 
 const ChatRoom = ({ chat, messages: initialMessages }) => {
-  const userId = 1; // 하드코딩된 사용자 ID
+  const user = { userId: 2, senderName: "John Doe" };
   const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
   const [lastEvaluatedSendTime, setLastEvaluatedSendTime] = useState(null);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const [stompClient, setStompClient] = useState(null); // Stomp client 상태
+  const stompClientRef = useRef(null);
+
+  const socketUrl = "ws://localhost:8080/ws-chat"; // WebSocket 서버 URL
 
   // 시간 형식 변환 함수
   const formatTime = (epochSeconds) => {
@@ -27,7 +33,7 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
       const formattedMessages = initialMessages
         .map((message) => ({
           ...message,
-          isMyMessage: message.senderId === userId,
+          isMyMessage: message.senderId === user.userId,
         }))
         .sort((a, b) => a.sendTime - b.sendTime); // 시간순 정렬
       setMessages(formattedMessages);
@@ -40,48 +46,75 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
     }
   }, [initialMessages]);
 
+  // WebSocket 연결
+  useEffect(() => {
+    const client = Stomp.over(() => new WebSocket(socketUrl));    
+    client.reconnectDelay = 5000;
+  
+    client.connect({ userId: user.userId, chatRoomId: chat.id }, () => {
+      console.log("웹소켓 연결 성공");
+  
+      client.subscribe(`/topic/chat/${chat.id}`, (message) => {
+        const newMessage = JSON.parse(message.body);
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+    });
+  
+    setStompClient(client);
+    stompClientRef.current = client;
+  
+    return () => {
+      if (stompClientRef.current) {
+        // 헤더를 포함한 DISCONNECT 요청
+        stompClientRef.current.disconnect(
+          () => {
+            console.log("웹소켓 연결 종료");
+          },
+          { userId: user.userId, chatRoomId: chat.id } // 헤더 추가
+        );
+      }
+    };
+  }, [chat.id]);
+
   // 스크롤을 항상 최신 메시지에 고정
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-// 이전 메시지 로드
-// 이전 메시지 로드
-const loadPreviousMessages = async () => {
-  if (loading || !lastEvaluatedSendTime) return; // 이미 로딩 중이거나 더 가져올 메시지가 없으면 종료
-  setLoading(true);
+  // 이전 메시지 로드
+  const loadPreviousMessages = async () => {
+    if (loading || !lastEvaluatedSendTime) return; // 이미 로딩 중이거나 더 가져올 메시지가 없으면 종료
+    setLoading(true);
 
-  // 현재 스크롤 위치 저장
-  const currentScrollHeight = messagesContainerRef.current.scrollHeight;
-  const currentScrollTop = messagesContainerRef.current.scrollTop;
+    const currentScrollHeight = messagesContainerRef.current.scrollHeight;
+    const currentScrollTop = messagesContainerRef.current.scrollTop;
 
-  try {
-    const previousMessages = await getChatMessages(
-      chat.id,
-      lastEvaluatedSendTime,
-      userId // userId를 전달
-    );
-    if (previousMessages.messages?.length > 0) {
-      const formattedMessages = previousMessages.messages.map((message) => ({
-        ...message,
-        isMyMessage: message.senderId === userId,
-      }));
-      setMessages((prev) => [...formattedMessages, ...prev]); // 이전 메시지를 앞에 추가
-      setLastEvaluatedSendTime(previousMessages.lastEvaluatedSendTime);
+    try {
+      const previousMessages = await getChatMessages(
+        chat.id,
+        lastEvaluatedSendTime,
+        user.userId
+      );
+      if (previousMessages.messages?.length > 0) {
+        const formattedMessages = previousMessages.messages.map((message) => ({
+          ...message,
+          isMyMessage: message.senderId === user.userId,
+        }));
+        setMessages((prev) => [...formattedMessages, ...prev]);
+        setLastEvaluatedSendTime(previousMessages.lastEvaluatedSendTime);
 
-      // 메시지 추가 후 스크롤 위치 복원
-      setTimeout(() => {
-        const newScrollHeight = messagesContainerRef.current.scrollHeight;
-        messagesContainerRef.current.scrollTop =
-          newScrollHeight - currentScrollHeight + currentScrollTop;
-      }, 0); // DOM 업데이트 후 스크롤 위치 복원
+        setTimeout(() => {
+          const newScrollHeight = messagesContainerRef.current.scrollHeight;
+          messagesContainerRef.current.scrollTop =
+            newScrollHeight - currentScrollHeight + currentScrollTop;
+        }, 0);
+      }
+    } catch (error) {
+      console.error("이전 메시지를 가져오는 중 오류:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("이전 메시지를 가져오는 중 오류:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // 스크롤 이벤트 핸들러
   const handleScroll = () => {
@@ -90,20 +123,26 @@ const loadPreviousMessages = async () => {
     }
   };
 
-  const [newMessage, setNewMessage] = useState("");
-
+  // 메시지 전송
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
-    const newMessageData = {
-      senderName: "나",
+    const messageData = {
+      senderId: user.userId,
+      senderName:user.senderName,
       content: newMessage,
-      isMyMessage: true,
       sendTime: Math.floor(Date.now() / 1000),
+      chatRoomId: chat.id,
     };
+    console.log(messageData.sendTime)
 
-    setMessages((prev) => [...prev, newMessageData]);
-    setNewMessage("");
+    if (stompClient && stompClient.connected) {
+      stompClient.send("/publish/chat.send", {}, JSON.stringify(messageData));
+      setMessages((prev) => [...prev, { ...messageData, isMyMessage: true }]);
+      setNewMessage("");
+    } else {
+      console.error("WebSocket 연결이 유효하지 않습니다.");
+    }
   };
 
   if (!chat) {

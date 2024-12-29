@@ -46,7 +46,7 @@
   margin-bottom: 10px;
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 제목/인원수와 동그라미를 양쪽에 배치 */
   align-items: center;
 }
 
@@ -54,15 +54,36 @@
   background: #e6e6e6;
 }
 
+.chat-item-left {
+  display: flex;
+  align-items: center;
+}
+
 .chat-item-title {
   font-size: 14px;
   font-weight: bold;
+  margin-right: 8px; /* 제목과 인원 수 간격 */
 }
 
 .chat-item-participants {
   font-size: 12px;
   color: #666;
 }
+
+.chat-unread {
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 
 /* Chat Room Section */
 .chat-room-section {
