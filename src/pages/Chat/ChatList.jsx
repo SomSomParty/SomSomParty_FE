@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getChatRoomList } from "../../api/myChatListApi"; // API 호출 함수
+import { getChatRoomList, leaveChatRoom } from "../../api/myChatListApi"; // API 호출 함수
 import "./ChatPage.css";
 
 const ChatList = ({ onChatSelect }) => {
   const [chats, setChats] = useState([]); // 채팅방 목록 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
-  const userId = 2; // 하드코딩된 사용자 ID
+  const userId = 1; // 하드코딩된 사용자 ID
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -25,11 +25,18 @@ const ChatList = ({ onChatSelect }) => {
   const handleChatClick = (chat) => {
     // 클릭한 채팅방의 unreadCount를 0으로 업데이트
     setChats((prevChats) =>
-      prevChats.map((c) =>
-        c.id === chat.id ? { ...c, unReadCount: 0 } : c
-      )
+      prevChats.map((c) => (c.id === chat.id ? { ...c, unReadCount: 0 } : c))
     );
     onChatSelect(chat); // 채팅방 선택 핸들러 호출
+  };
+
+  const handleLeaveChat = async (chat) => {
+    try {
+      await leaveChatRoom(userId, chat.id); // userId와 chatRoomId를 API로 전달
+      setChats((prevChats) => prevChats.filter((c) => c.id !== chat.id)); // 상태에서 채팅방 제거
+    } catch (error) {
+      console.error("채팅방 나가기 중 오류:", error);
+    }
   };
 
   if (loading) {
@@ -43,20 +50,22 @@ const ChatList = ({ onChatSelect }) => {
   return (
     <ul className="chat-list">
       {chats.map((chat) => (
-        <li
-          key={chat.id}
-          className="chat-item"
-          onClick={() => handleChatClick(chat)} // 클릭 핸들러
-        >
+        <li key={chat.id} className="chat-item">
           {/* 왼쪽: 제목과 인원 */}
-          <div className="chat-item-left">
+          <div className="chat-item-left" onClick={() => handleChatClick(chat)}>
             <div className="chat-item-title">{chat.title}</div>
             <div className="chat-item-participants">{chat.userCount}명</div>
+            {chat.unReadCount > 0 && (
+              <div className="chat-unread">{chat.unReadCount}</div>
+            )}
           </div>
-          {/* 오른쪽: Unread Count */}
-          {chat.unReadCount > 0 && (
-            <div className="chat-unread">{chat.unReadCount}</div>
-          )}
+          {/* 오른쪽: 나가기 버튼 */}
+          <button
+            className="chat-leave-button"
+            onClick={() => handleLeaveChat(chat)}
+          >
+            나가기
+          </button>
         </li>
       ))}
     </ul>

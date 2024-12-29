@@ -10,3 +10,17 @@ export const getChatRoomList = async (userId) => {
     throw error;
   }
 };
+
+// 채팅방 나가기
+export const leaveChatRoom = async (userId, chatRoomId) => {
+  try {
+    const response = await axios.delete(
+      `/api/festivals/chatting/delete/${userId}`,
+      { params: { chatRoomId } } // query parameter로 chatRoomId 전달
+    );
+    return response.data; // 데이터 반환
+  } catch (error) {
+    console.error("채팅방 나가기 중 오류:", error);
+    throw error;
+  }
+};

@@ -31,7 +31,6 @@
   overflow-y: auto;
   box-sizing: border-box;
 }
-
 .chat-list {
   list-style: none;
   padding: 0;
@@ -44,25 +43,20 @@
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 10px;
-  cursor: pointer;
   display: flex;
-  justify-content: space-between; /* 제목/인원수와 동그라미를 양쪽에 배치 */
+  justify-content: space-between;
   align-items: center;
-}
-
-.chat-item:hover {
-  background: #e6e6e6;
 }
 
 .chat-item-left {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .chat-item-title {
   font-size: 14px;
   font-weight: bold;
-  margin-right: 8px; /* 제목과 인원 수 간격 */
 }
 
 .chat-item-participants {
@@ -81,6 +75,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.chat-leave-button {
+  background-color: #afafaf;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.chat-leave-button:hover {
+  background-color: #ff1a1a;
 }
 
 
