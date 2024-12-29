@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import CardList from '../../components/CardList';
 import axios from 'axios';
 import '../../styles/CardList.css';
 import '../../styles/my/MyPage.css';
+import {AuthContext} from "../../context/AuthContext";
 
 const MyPage = () => {
     const [events, setEvents] = useState([]);
@@ -10,6 +11,7 @@ const MyPage = () => {
     const [lastId, setLastId] = useState(0);
     const [limit] = useState(8);
     const [hasMore, setHasMore] = useState(true);
+    const {accessToken} = useContext(AuthContext);
 
     // 예약 목록 가져오기
     const fetchReservationList = async () => {
@@ -17,12 +19,13 @@ const MyPage = () => {
         if (!hasMore) return;
 
         try {
-            // TODO: 로그인한 유저 정보로 변경하기
             const response = await axios.get('/api/reservations', {
                 params: {
-                    userId: 1,
                     lastId: lastId,
                     limit: limit,
+                },
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
                 },
             });
 
@@ -33,8 +36,8 @@ const MyPage = () => {
                 ...reservations.map((reservation) => ({
                     id: reservation.id,
                     name: reservation.festivalInfo.name,
-                    reservationDate: reservation.reservationDate,
-                    festivalDate: reservation.festivalDate
+                    reservationDate: `${reservation.reservationDate[0]}.${String(reservation.reservationDate[1]).padStart(2, '0')}.${String(reservation.reservationDate[2]).padStart(2, '0')}`,
+                    festivalDate: `${reservation.festivalDate[0]}.${String(reservation.festivalDate[1]).padStart(2, '0')}.${String(reservation.festivalDate[2]).padStart(2, '0')}`
                 })),
             ]);
 
