@@ -1,0 +1,35 @@
+name: Deploy to S3                   # Workflow 이름
+on:                                  # Event 감지
+  push:
+    branches:
+      - dev                        
+jobs:                                # Job 설정
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code          # Repo checkout
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js         # Node v 확인
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+        
+      - name: Install dependencies    # 의존 파일 설치
+        run: npm install
+      
+      - name: Build project           # React Build
+        run: npm run build
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      
+      - name: Deploy to S3
+        run: aws s3 sync ./build s3://${{ secrets.AWS_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront Cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
