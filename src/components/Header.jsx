@@ -9,7 +9,7 @@ const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { accessToken, setAccessToken, setRefreshToken, setUserName } = useContext(AuthContext);
+    const { accessToken, setAccessToken, setRefreshToken, setUserName, fcmToken, setFcmToken } = useContext(AuthContext);
 
     // 로고 클릭 이벤트 핸들러
     const handleLogoClick = () => {
@@ -21,12 +21,24 @@ const Header = () => {
     };
 
     const handleLogout = async () => {
-        const apiUrl = '/api/signout'; 
+        const logoutUrl = '/api/signout'; 
+        const deactivateTokenUrl = '/api/notification/deactivate';
+
+        try {
+            await axios.post(deactivateTokenUrl, { token: fcmToken }, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                }
+            });
+            console.log("FCM 비활성화 성공");
+        } catch (deactivateError) {
+            console.error("FCM 비활성화 실패:", deactivateError.response?.data || deactivateError.message);
+        }
 
         try {
             console.log("로그아웃 요청 전송");
             
-            await axios.post(apiUrl, null, {
+            await axios.post(logoutUrl, null, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`, // 토큰 추가
                 },
