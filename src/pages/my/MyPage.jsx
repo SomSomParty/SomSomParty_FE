@@ -1,4 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
 import CardList from '../../components/CardList';
 import axios from 'axios';
 import '../../styles/CardList.css';
@@ -11,6 +13,7 @@ const MyPage = () => {
     const [lastId, setLastId] = useState(0);
     const [limit] = useState(8);
     const [hasMore, setHasMore] = useState(true);
+    const navigate = useNavigate();
     const {accessToken} = useContext(AuthContext);
 
     // 예약 목록 가져오기
@@ -52,9 +55,22 @@ const MyPage = () => {
         fetchReservationList();
     }, []);
 
+    // 카드 클릭 시 이벤트 처리
+    const handleEventClick = (eventId) => {
+        navigate(`/festival?id=${eventId}`); // `/festival` 경로로 이동
+    };
+
     return (
         <div className="my-page-container">
-            <p className="my-page-title">내 예약 조회</p>
+            <div className="my-page-header">
+                <p
+                    className="my-page-link"
+                    onClick={() => navigate('/chat')}
+                >
+                    내 채팅방
+                </p>
+                <p className="my-page-title">내 예약 조회</p>
+            </div>
             {events.length > 0 ? (
                 <>
                     <CardList events={events} />
