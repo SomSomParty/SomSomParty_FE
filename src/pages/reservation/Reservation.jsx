@@ -5,6 +5,7 @@ import Calendar from "../../components/reservation/Calendar";
 import ReservationInfo from "../../components/reservation/ReservationInfo";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import { jwtDecode } from "jwt-decode";
 
 const Reservation = () => {
   const { festivalId } = useParams();
@@ -19,16 +20,16 @@ const Reservation = () => {
     setRefreshToken,
     userName,
     setUserName,
+    idToken,
   } = useContext(AuthContext);
   const accessTokenRef = useRef(accessToken);
 
   const handleLeaveQueue = async () => {
     try {
-      await axios.delete(`/api/queues/festival${festivalId}/leave-proceed`, {
-        headers: {
-          Authorization: `Bearer ${accessTokenRef.current}`, // 토큰을 인증 헤더로 추가
-        },
-      });
+      const email = jwtDecode(idToken).email;
+      await axios.delete(
+        `/api/queues/festival${festivalId}/users/${email}/leave-proceed`
+      );
       console.log("Successfully left the wait queue");
       return true;
     } catch (error) {
