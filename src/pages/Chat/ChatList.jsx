@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import { getChatRoomList, leaveChatRoom } from "../../api/myChatListApi"; // API 호출 함수
 import "./ChatPage.css";
+import {AuthContext} from "../../context/AuthContext";
 
 const ChatList = ({ onChatSelect }) => {
   const [chats, setChats] = useState([]); // 채팅방 목록 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
-  const userId = 1; // 하드코딩된 사용자 ID
+  const {accessToken} = useContext(AuthContext);
 
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const chatRooms = await getChatRoomList(userId); // API 호출
+        const chatRooms = await getChatRoomList(accessToken); // API 호출
         setChats(chatRooms); // 상태에 데이터 저장
       } catch (error) {
         console.error("채팅방 목록을 가져오는 중 오류:", error);
@@ -32,7 +33,7 @@ const ChatList = ({ onChatSelect }) => {
 
   const handleLeaveChat = async (chat) => {
     try {
-      await leaveChatRoom(userId, chat.id); // userId와 chatRoomId를 API로 전달
+      await leaveChatRoom(accessToken, chat.id); // userId와 chatRoomId를 API로 전달
       setChats((prevChats) => prevChats.filter((c) => c.id !== chat.id)); // 상태에서 채팅방 제거
     } catch (error) {
       console.error("채팅방 나가기 중 오류:", error);

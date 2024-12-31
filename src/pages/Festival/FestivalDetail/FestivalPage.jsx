@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { joinChatRoom, enterChatRoom } from "../../../api/chatJoinApi";
 import FestivalImage from "./FestivalImage";  // 이미지를 처리하는 컴포넌트
 import FestivalButton from "./FestivalButton";
 import "./FestivalDetail.css";
 import axios from "axios";
+import {AuthContext} from "../../../context/AuthContext";
 
 const FestivalPage = () => {
   const location = useLocation();
   const eventId = location.pathname.split('/')[2];
   console.log("Event ID from URL:", eventId);  
   const navigate = useNavigate();
-  const userId = 1; // 하드코딩된 사용자 ID
+  const {accessToken} = useContext(AuthContext);
+  const {userId} = useContext(AuthContext);
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ const FestivalPage = () => {
 
   const handleEnterChatRoom = async () => {
     try {
-      const chatRoomId = await joinChatRoom(event.id, userId);
+      const chatRoomId = await joinChatRoom(event.id, accessToken);
       const chatRoomData = await enterChatRoom(chatRoomId, userId);
 
       navigate("/chat", {

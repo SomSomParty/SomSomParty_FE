@@ -1,10 +1,12 @@
 import axios from "axios";
 
 // 채팅방 참여 API
-export const joinChatRoom = async (chatRoomId, userId) => {
+export const joinChatRoom = async (chatRoomId, accessToken) => {
   try {
-    const response = await axios.post(`/api/festivals/chatting/${chatRoomId}/join`, {}, {
-      params: { userId },
+    const response = await axios.post(`/api/festivals/chatting/${chatRoomId}/join`, null, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     return response.data; // 반환된 chatRoomId
   } catch (error) {

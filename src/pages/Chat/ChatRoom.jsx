@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef, useContext} from "react";
 import "./ChatRoom.css";
 import { getChatMessages } from "../../api/chatApi"; // 메시지 가져오는 API 호출 함수
 import { Stomp } from "@stomp/stompjs";
 
 const ChatRoom = ({ chat, messages: initialMessages }) => {
-  const user = { userId: 1, senderName: "John Doe" };
+  const userId = localStorage.getItem("userId");
+  const userNickname = localStorage.getItem("userNickname");
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [lastEvaluatedSendTime, setLastEvaluatedSendTime] = useState(null);
@@ -33,7 +34,7 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
       const formattedMessages = initialMessages
         .map((message) => ({
           ...message,
-          isMyMessage: message.senderId === user.userId,
+          isMyMessage: message.senderId === userId,
         }))
         .sort((a, b) => a.sendTime - b.sendTime); // 시간순 정렬
       setMessages(formattedMessages);
@@ -51,7 +52,7 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
     const client = Stomp.over(() => new WebSocket(socketUrl));    
     client.reconnectDelay = 5000;
   
-    client.connect({ userId: user.userId, chatRoomId: chat.id }, () => {
+    client.connect({ userId: userId, chatRoomId: chat.id }, () => {
       console.log("웹소켓 연결 성공");
   
       client.subscribe(`/topic/chat/${chat.id}`, (message) => {
@@ -70,7 +71,7 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
           () => {
             console.log("웹소켓 연결 종료");
           },
-          { userId: user.userId, chatRoomId: chat.id } // 헤더 추가
+          { userId: userId, chatRoomId: chat.id } // 헤더 추가
         );
       }
     };
@@ -91,14 +92,14 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
 
     try {
       const previousMessages = await getChatMessages(
-        chat.id,
-        lastEvaluatedSendTime,
-        user.userId
+          chat.id,
+          lastEvaluatedSendTime,
+          userId
       );
       if (previousMessages.messages?.length > 0) {
         const formattedMessages = previousMessages.messages.map((message) => ({
           ...message,
-          isMyMessage: message.senderId === user.userId,
+          isMyMessage: message.senderId === userId,
         }));
         setMessages((prev) => [...formattedMessages, ...prev]);
         setLastEvaluatedSendTime(previousMessages.lastEvaluatedSendTime);
@@ -128,8 +129,8 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
     if (!newMessage.trim()) return;
 
     const messageData = {
-      senderId: user.userId,
-      senderName:user.senderName,
+      senderId: userId,
+      senderName: userNickname,
       content: newMessage,
       sendTime: Math.floor(Date.now() / 1000),
       chatRoomId: chat.id,
