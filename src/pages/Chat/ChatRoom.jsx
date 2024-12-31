@@ -4,7 +4,7 @@ import { getChatMessages } from "../../api/chatApi"; // 메시지 가져오는 A
 import { Stomp } from "@stomp/stompjs";
 
 const ChatRoom = ({ chat, messages: initialMessages }) => {
-  const userId = localStorage.getItem("userId");
+  const userId = Number(localStorage.getItem("userId"));
   const userNickname = localStorage.getItem("userNickname");
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
