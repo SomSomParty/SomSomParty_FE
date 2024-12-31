@@ -1,16 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const WaitingRoom = () => {
   const { festivalId } = useParams();
   const navigate = useNavigate();
   const [userRank, setUserRank] = useState(null);
+  const {
+    accessToken,
+    setAccessToken,
+    refreshToken,
+    setRefreshToken,
+    userName,
+    setUserName,
+  } = useContext(AuthContext);
+  let isRefreshing = false;
 
-  useEffect(() => {
-    registerWaitingRoom();
+  useEffect(() => { 
+    const fetchData = async () => {
+      const status = await reissueAccessToken();
+      console.log(status);
+      if (status === true) {
+        console.log(status);
+        registerWaitingRoom();
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
   useEffect(() => {
     const interval = setInterval(fetchUserRank, 400);
@@ -53,44 +73,57 @@ const WaitingRoom = () => {
   // 대기열에서 유저를 제거하는 함수
   const handleLeaveQueue = async () => {
     try {
-      // 로그인 시 이메일 하드 코딩 변경 예정
-      const email = "user10@example.com";
-      await axios.delete(
-        `/api/queues/festival${festivalId}/users/${email}/leave`
-      );
+      await axios.delete(`/api/queues/festival${festivalId}/leave`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // 토큰을 인증 헤더로 추가
+        },
+      });
       console.log("Successfully left the wait queue");
     } catch (error) {
-      console.error("Error leaving the wait queue:", error);
+      console.log(error);
     }
   };
 
+  // 대기열에 유저를 등록
   const registerWaitingRoom = async () => {
     try {
-      // 로그인 시 이메일 하드 코딩 변경 예정
-      const email = "user10@example.com";
+      console.log("대기열에 유저를 등록");
       const response = await axios.get(
-        `/api/queues/festival${festivalId}/waiting-room/users/${email}`
+        `/api/queues/festival${festivalId}/waiting-room`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // 토큰을 인증 헤더로 추가
+          },
+        }
       );
       console.log("Response:", response.data); // 응답 데이터 확인
       setUserRank(response.data.rank); // userRank 상태 업데이트
     } catch (error) {
-      console.error("Error fetching waiting room data:", error);
+      console.log(error);
     }
   };
 
   const fetchUserRank = async () => {
     try {
-      // 로그인 시 이메일 하드 코딩 변경 예정
-      const email = "user10@example.com";
       const response = await axios.get(
-        `/api/queues/festival${festivalId}/users/${email}/rank`
+        `/api/queues/festival${festivalId}/rank`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // 토큰을 인증 헤더로 추가
+          },
+        }
       );
       const { rank } = response.data;
       console.log(response.data);
       if (rank <= 0) {
         // 다시 한번 더 확인
         const response = await axios.get(
-          `/api/queues/festival${festivalId}/users/${email}/allowed`
+          `/api/queues/festival${festivalId}/allowed`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // 토큰을 인증 헤더로 추가
+            },
+          }
         );
         if (response.data.allowed) {
           navigate(`/reservation/${festivalId}`);
@@ -100,9 +133,40 @@ const WaitingRoom = () => {
         setUserRank(rank);
       }
     } catch (error) {
-      console.error("Error fetching user rank:", error);
+      console.log(error);
     }
   };
+
+  const reissueAccessToken = async () => {
+    try {
+      if (!isRefreshing) {
+        isRefreshing = true; // 토큰 재발급 시작
+        const apiResponse = await axios.post(`/api/refresh-token`, null, {
+          headers: {
+            Refreshtoken: refreshToken, // 리프레시 토큰을 인증 헤더로 추가
+          },
+          params: {
+            username: userName, // URL 파라미터로 사용자 이름 전달
+          },
+        });
+        const newAccessToken = apiResponse.data.accessToken;
+        console.log("accesstoken 재발급");
+        setAccessToken(newAccessToken);
+        return true;
+      }
+    } catch (error) {
+      if (error.response.data.message == "Refresh Token이 만료되었습니다.") {
+        setAccessToken("");
+        setRefreshToken("");
+        setUserName("");
+        alert("세션이 만료되었습니다. 다시 로그인 하세요.");
+        window.location.href = "/signin";
+      }
+    } finally {
+      isRefreshing = false;
+    }
+  };
+
   return (
     <Container>
       <Circle>
