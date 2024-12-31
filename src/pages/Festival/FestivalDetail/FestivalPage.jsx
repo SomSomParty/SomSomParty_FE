@@ -73,7 +73,7 @@ const FestivalPage = () => {
       </div>
       <div className="festival-page-buttons">
         <FestivalButton label="채팅방 입장하기" onClick={handleEnterChatRoom} />
-        <FestivalButton label="예약하기" />
+        <FestivalButton label="예약하기" onClick={() => navigate(`/waiting-room/${eventId}`)}/>
       </div>
     </div>
   );
