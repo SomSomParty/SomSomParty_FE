@@ -61,10 +61,6 @@ const MyPage = () => {
       );
       setHasMore(hasNext);
     } catch (error) {
-      if (error.response.data == "토큰 검증에 실패했습니다.") {
-        reissueAccessToken();
-        fetchReservationList();
-      }
       setError("예약 목록을 불러오는 중 문제가 발생했습니다.");
     }
   };
