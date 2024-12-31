@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken') || "");
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || "");
   const [fcmToken, setFcmToken] = useState(() => localStorage.getItem('fcmToken') || "");
+  const [idToken, setIdToken] = useState(() => localStorage.getItem('idToken') || "");
 
   useEffect(() => {
     if (accessToken) {
@@ -32,7 +33,13 @@ export const AuthProvider = ({ children }) => {
     } else {
       localStorage.removeItem('fcmToken');
     }
-  }, [accessToken, refreshToken, userName, fcmToken]);
+
+    if (idToken) {
+      localStorage.setItem('idToken', idToken);
+    } else {
+      localStorage.removeItem('idToken');
+    }
+  }, [accessToken, refreshToken, userName, fcmToken, idToken]);
 
   return (
     <AuthContext.Provider
@@ -45,6 +52,8 @@ export const AuthProvider = ({ children }) => {
         setUserName,
         fcmToken,
         setFcmToken,
+        idToken,
+        setIdToken,
       }}
     >
       {children}
