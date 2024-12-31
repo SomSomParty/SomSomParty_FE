@@ -1,26 +1,74 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { AuthContext } from "../../context/AuthContext";
 
 const ReservationInfo = ({ festivalId, selectedDate }) => {
   const navigate = useNavigate();
-  console.log(festivalId);
+  const {
+    accessToken,
+    setAccessToken,
+    refreshToken,
+    setRefreshToken,
+    userName,
+    setUserName,
+  } = useContext(AuthContext);
+  const accessTokenRef = useRef(accessToken);
 
   const handleNext = async () => {
-    // 로그인 시 이메일 하드 코딩 변경 예정
     try {
-      const apiResponse = await axios.post("/api/reservations", {
-        userId: 1,
-        festivalId: festivalId,
-        festivalDate: selectedDate
-      });
+      await axios.post(
+        "/api/reservations",
+        {
+          festivalId: festivalId,
+          festivalDate: selectedDate,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessTokenRef.current}`,
+          },
+        }
+      );
       navigate("/reservation/completed");
     } catch (error) {
-      alert(error.response.data.message);
+      if (error.response.data == "토큰 검증에 실패했습니다.") {
+        const status = await reissueAccessToken();
+        if (status === true) {
+          console.log(status);
+          await handleNext();
+        }
+      } else {
+        alert(error.response.data.message);
+      }
     }
   };
 
+  const reissueAccessToken = async () => {
+    try {
+      const apiResponse = await axios.post(`/api/refresh-token`, null, {
+        headers: {
+          Refreshtoken: refreshToken, // 리프레시 토큰을 인증 헤더로 추가
+        },
+        params: {
+          username: userName, // URL 파라미터로 사용자 이름 전달
+        },
+      });
+      const newAccessToken = apiResponse.data.accessToken;
+      console.log("accesstoken 재발급");
+      setAccessToken(newAccessToken);
+      accessTokenRef.current = newAccessToken;
+      return true;
+    } catch (error) {
+      if (error.response.data.message == "Refresh Token이 만료되었습니다.") {
+        setAccessToken("");
+        setRefreshToken("");
+        setUserName("");
+        alert("세션이 만료되었습니다. 다시 로그인 하세요.");
+        window.location.href = "/signin";
+      }
+    }
+  };
   return (
     <Container>
       <ReservationContainer>
