@@ -11,7 +11,7 @@ function SignInPage() {
   const [error, setError] = useState(""); // 로그인 실패 시 에러 메시지
   const [success, setSuccess] = useState(""); // 성공 메시지 관리
 
-  const { setAccessToken, setRefreshToken, setUserName, setFcmToken } = useContext(AuthContext);
+  const { setAccessToken, setRefreshToken, setUserName, setFcmToken, setIdToken } = useContext(AuthContext);
 
   const navigate = useNavigate(); 
 
@@ -37,12 +37,15 @@ function SignInPage() {
       setError("");
 
       // 응답 데이터에서 토큰과 사용자 이름 추출
-      const { accessToken, refreshToken, userName, userId, userNickname } = response.data;
+      const { accessToken, refreshToken, userName, idToken, userId, userNickname } = response.data;
 
       // AuthContext에 저장
       setAccessToken(accessToken);
       setRefreshToken(refreshToken);
       setUserName(userName);
+      setIdToken(idToken);
+
+      console.log(idToken);
 
       localStorage.setItem("userId", userId);
       localStorage.setItem("userNickname", userNickname);

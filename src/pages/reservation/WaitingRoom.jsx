@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
+import { jwtDecode } from "jwt-decode";
 
 const WaitingRoom = () => {
   const { festivalId } = useParams();
   const navigate = useNavigate();
   const [userRank, setUserRank] = useState(null);
+  const { idToken } = useContext(AuthContext);
+  const email = jwtDecode(idToken).email;
 
   useEffect(() => {
     registerWaitingRoom();
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(fetchUserRank, 400);
+    const interval = setInterval(fetchUserRank, 1000);
     return () => clearInterval(interval);
   }, [userRank]);
 
@@ -53,8 +57,6 @@ const WaitingRoom = () => {
   // 대기열에서 유저를 제거하는 함수
   const handleLeaveQueue = async () => {
     try {
-      // 로그인 시 이메일 하드 코딩 변경 예정
-      const email = "user10@example.com";
       await axios.delete(
         `/api/queues/festival${festivalId}/users/${email}/leave`
       );
@@ -64,10 +66,10 @@ const WaitingRoom = () => {
     }
   };
 
+  // 대기열에 유저를 등록
   const registerWaitingRoom = async () => {
     try {
-      // 로그인 시 이메일 하드 코딩 변경 예정
-      const email = "user10@example.com";
+      console.log("대기열에 유저를 등록");
       const response = await axios.get(
         `/api/queues/festival${festivalId}/waiting-room/users/${email}`
       );
@@ -80,8 +82,6 @@ const WaitingRoom = () => {
 
   const fetchUserRank = async () => {
     try {
-      // 로그인 시 이메일 하드 코딩 변경 예정
-      const email = "user10@example.com";
       const response = await axios.get(
         `/api/queues/festival${festivalId}/users/${email}/rank`
       );
@@ -96,13 +96,13 @@ const WaitingRoom = () => {
           navigate(`/reservation/${festivalId}`);
         }
       } else {
-        console.log(rank);
         setUserRank(rank);
       }
     } catch (error) {
-      console.error("Error fetching user rank:", error);
+      console.log(error);
     }
   };
+
   return (
     <Container>
       <Circle>

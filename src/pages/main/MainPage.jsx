@@ -30,7 +30,7 @@ const MainPage = () => {
             setEvents((prevEvents) => [
                 ...prevEvents,
                 ...festivals.map((festival) => ({
-                    id: festival.id,
+                    festivalId: festival.id,
                     name: festival.name,
                     startDate: festival.startDate.replace(/-/g, '.'),
                     endDate: festival.endDate.replace(/-/g, '.'),
@@ -49,9 +49,9 @@ const MainPage = () => {
     }, []);
 
     // 축제 카드 클릭 시 상세 페이지로 이동
-    const handleCardClick = (id) => {
-        console.log("Card clicked, event ID:", id);
-        navigate(`/festival-detail/${id}`); // 상세 페이지로 이동
+    const handleEventClick = (eventId) => {
+        console.log(eventId);
+        navigate(`/festival-detail/${eventId}`); // `/festival` 경로로 이동
     };
 
     // 검색어 입력 시 상태 업데이트
@@ -89,7 +89,7 @@ const MainPage = () => {
             const { festivals, hasNext } = response.data;
             setEvents(
                 festivals.map((festival) => ({
-                    id: festival.id,
+                    festivalId: festival.id,
                     name: festival.name,
                     startDate: festival.startDate.replace(/-/g, '.'),
                     endDate: festival.endDate.replace(/-/g, '.'),
@@ -117,7 +117,7 @@ const MainPage = () => {
                     <img src="/searchIcon.png" alt="Search" className="search-icon" />
                 </button>
             </div>
-            <CardList events={events} onEventClick={handleCardClick} />
+            <CardList events={events} onEventClick={handleEventClick} />
             {hasMore && (
                 <button className="more-button" onClick={fetchFestivalList}>
                     더 보기
