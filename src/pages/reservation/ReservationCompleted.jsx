@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const ReservationCompleted = () => {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <ReservationContent>
@@ -10,7 +13,7 @@ const ReservationCompleted = () => {
           alt="체크 이미지"
         />
         <TitleText>예약이 확정되었습니다.</TitleText>
-        <ConfirmText>확인</ConfirmText>
+        <ConfirmText onClick={() => navigate('/mypage')}>확인</ConfirmText>
       </ReservationContent>
     </Container>
   );
