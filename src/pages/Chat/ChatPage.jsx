@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import { useLocation } from "react-router-dom";
 import ChatList from "./ChatList";
 import ChatRoom from "./ChatRoom";
 import { enterChatRoom } from "../../api/chatJoinApi"; // API 호출 함수
 import "./ChatPage.css";
+import {AuthContext} from "../../context/AuthContext";
 
 const ChatPage = () => {
   const location = useLocation();
   const [selectedChat, setSelectedChat] = useState(location.state?.chat || null);
   const [messages, setMessages] = useState(location.state?.messages || []);
+  const {userId} = useContext(AuthContext);
 
   const handleChatSelect = async (chat) => {
     try {
-      const chatRoomData = await enterChatRoom(chat.id, 1); // userId는 하드코딩된 값
+      const chatRoomData = await enterChatRoom(chat.id, userId);
       setSelectedChat(chat);
       setMessages(chatRoomData.messages || []);
     } catch (error) {

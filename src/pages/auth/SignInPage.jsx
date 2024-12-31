@@ -37,7 +37,7 @@ function SignInPage() {
       setError("");
 
       // 응답 데이터에서 토큰과 사용자 이름 추출
-      const { accessToken, refreshToken, userName, idToken } = response.data;
+      const { accessToken, refreshToken, userName, idToken, userId, userNickname } = response.data;
 
       // AuthContext에 저장
       setAccessToken(accessToken);
@@ -46,6 +46,9 @@ function SignInPage() {
       setIdToken(idToken);
 
       console.log(idToken);
+
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("userNickname", userNickname);
 
       alert('로그인되었습니다!'); 
 

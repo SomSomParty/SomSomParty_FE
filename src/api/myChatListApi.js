@@ -1,9 +1,13 @@
 import axios from "axios";
 
 // 채팅방 리스트 가져오기
-export const getChatRoomList = async (userId) => {
+export const getChatRoomList = async (accessToken) => {
   try {
-    const response = await axios.get(`/api/festivals/chatting/list/${userId}`);
+    const response = await axios.get(`/api/festivals/chatting/list`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
     return response.data; // 데이터 반환
   } catch (error) {
     console.error("Error fetching chat room list:", error);
@@ -12,11 +16,11 @@ export const getChatRoomList = async (userId) => {
 };
 
 // 채팅방 나가기
-export const leaveChatRoom = async (userId, chatRoomId) => {
+export const leaveChatRoom = async (accessToken, chatRoomId) => {
   try {
     const response = await axios.delete(
-      `/api/festivals/chatting/delete/${userId}`,
-      { params: { chatRoomId } } // query parameter로 chatRoomId 전달
+      `/api/festivals/chatting/delete`,
+        { params: { chatRoomId }, headers: { Authorization: `Bearer ${accessToken}`} } // query parameter로 chatRoomId 전달
     );
     return response.data; // 데이터 반환
   } catch (error) {
