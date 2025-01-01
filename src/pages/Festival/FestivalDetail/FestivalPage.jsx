@@ -51,6 +51,12 @@ const FestivalPage = () => {
   }
 
   const handleEnterChatRoom = async () => {
+    if (!accessToken) {
+      alert("로그인 후 다시 시도해주세요.");
+      navigate("/signin");
+      return;
+    }
+
     try {
       const chatRoomId = await joinChatRoom(event.id, accessToken);
       const chatRoomData = await enterChatRoom(chatRoomId, userId);
@@ -61,6 +67,16 @@ const FestivalPage = () => {
     } catch (error) {
       console.error("채팅방 입장 중 에러 발생:", error);
     }
+  };
+
+  const handleReserve = () => {
+    if (!accessToken) {
+      alert("로그인 후 다시 시도해주세요.");
+      navigate("/signin");
+      return;
+    }
+
+    navigate(`/waiting-room/${eventId}`);
   };
 
   return (
@@ -75,7 +91,7 @@ const FestivalPage = () => {
       </div>
       <div className="festival-page-buttons">
         <FestivalButton label="채팅방 입장하기" onClick={handleEnterChatRoom} />
-        <FestivalButton label="예약하기" onClick={() => navigate(`/waiting-room/${eventId}`)}/>
+        <FestivalButton label="예약하기" onClick={handleReserve} />
       </div>
     </div>
   );
