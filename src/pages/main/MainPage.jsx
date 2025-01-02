@@ -13,14 +13,16 @@ const MainPage = () => {
     const [limit] = useState(8);
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate(); // 페이지 이동을 위한 navigate
+    const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
+    console.log(API_BASE_URL);
     // 축제 목록 가져오기
     const fetchFestivalList = async () => {
         setError(null);
         if (!hasMore) return;
 
         try {
-            const endpoint = searchQuery.trim() ? '/api/festivals/search' : '/api/festivals';
+            const endpoint = searchQuery.trim() ? `${API_BASE_URL}/festivals/search` : `${API_BASE_URL}/festivals`;
             const params = searchQuery.trim()
             ? { lastId, limit: limit, keyword: searchQuery }
             : { lastId, limit: limit };
@@ -83,7 +85,7 @@ const MainPage = () => {
         }
 
         try {
-            const response = await axios.get('/api/festivals/search', {
+            const response = await axios.get(`${API_BASE_URL}/festivals/search`, {
                 params: { lastId: 0, limit: limit, keyword: searchQuery },
             });
             const { festivals, hasNext } = response.data;
