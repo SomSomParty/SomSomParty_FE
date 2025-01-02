@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
+
 // 채팅방 참여 API
 export const joinChatRoom = async (chatRoomId, accessToken) => {
   try {
-    const response = await axios.post(`/api/festivals/chatting/${chatRoomId}/join`, null, {
+    const response = await axios.post(`${API_BASE_URL}/festivals/chatting/${chatRoomId}/join`, null, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -18,7 +20,7 @@ export const joinChatRoom = async (chatRoomId, accessToken) => {
 // 채팅방 진입 API
 export const enterChatRoom = async (chatRoomId, userId, lastEvaluatedSendTime = null) => {
   try {
-    const response = await axios.get(`/api/festivals/chatting/${chatRoomId}`, {
+    const response = await axios.get(`${API_BASE_URL}/festivals/chatting/${chatRoomId}`, {
       params: {
         userId,
         lastEvaluatedSendTime, // 서버로부터 받은 값을 전달

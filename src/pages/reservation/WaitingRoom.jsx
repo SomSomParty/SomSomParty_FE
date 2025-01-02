@@ -11,6 +11,7 @@ const WaitingRoom = () => {
   const [userRank, setUserRank] = useState(null);
   const { idToken } = useContext(AuthContext);
   const email = jwtDecode(idToken).email;
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
   useEffect(() => {
     registerWaitingRoom();
@@ -58,7 +59,7 @@ const WaitingRoom = () => {
   const handleLeaveQueue = async () => {
     try {
       await axios.delete(
-        `/api/queues/festival${festivalId}/users/${email}/leave`
+        `${API_BASE_URL}/queues/festival${festivalId}/users/${email}/leave`
       );
       console.log("Successfully left the wait queue");
     } catch (error) {
@@ -71,7 +72,7 @@ const WaitingRoom = () => {
     try {
       console.log("대기열에 유저를 등록");
       const response = await axios.get(
-        `/api/queues/festival${festivalId}/waiting-room/users/${email}`
+        `${API_BASE_URL}/queues/festival${festivalId}/waiting-room/users/${email}`
       );
       console.log("Response:", response.data); // 응답 데이터 확인
       setUserRank(response.data.rank); // userRank 상태 업데이트
@@ -83,14 +84,14 @@ const WaitingRoom = () => {
   const fetchUserRank = async () => {
     try {
       const response = await axios.get(
-        `/api/queues/festival${festivalId}/users/${email}/rank`
+        `${API_BASE_URL}/queues/festival${festivalId}/users/${email}/rank`
       );
       const { rank } = response.data;
       console.log(response.data);
       if (rank <= 0) {
         // 다시 한번 더 확인
         const response = await axios.get(
-          `/api/queues/festival${festivalId}/users/${email}/allowed`
+          `${API_BASE_URL}/queues/festival${festivalId}/users/${email}/allowed`
         );
         if (response.data.allowed) {
           navigate(`/reservation/${festivalId}`);

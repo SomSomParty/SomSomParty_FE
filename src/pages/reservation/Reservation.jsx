@@ -23,12 +23,13 @@ const Reservation = () => {
     idToken,
   } = useContext(AuthContext);
   const accessTokenRef = useRef(accessToken);
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
   const handleLeaveQueue = async () => {
     try {
       const email = jwtDecode(idToken).email;
       await axios.delete(
-        `/api/queues/festival${festivalId}/users/${email}/leave-proceed`
+        `${API_BASE_URL}/queues/festival${festivalId}/users/${email}/leave-proceed`
       );
       console.log("Successfully left the wait queue");
       return true;
@@ -41,7 +42,7 @@ const Reservation = () => {
 
   const fetchDateRange = async () => {
     try {
-      const apiResponse = await axios.get(`/api/festivals/${festivalId}`, {
+      const apiResponse = await axios.get(`${API_BASE_URL}/festivals/${festivalId}`, {
         headers: {
           Authorization: `Bearer ${accessTokenRef.current}`, // 토큰을 인증 헤더로 추가
         },
@@ -71,7 +72,7 @@ const Reservation = () => {
 
   const reissueAccessToken = async () => {
     try {
-      const apiResponse = await axios.post(`/api/refresh-token`, null, {
+      const apiResponse = await axios.post(`${API_BASE_URL}/refresh-token`, null, {
         headers: {
           Refreshtoken: refreshToken, // 리프레시 토큰을 인증 헤더로 추가
         },

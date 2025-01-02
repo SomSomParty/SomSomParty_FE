@@ -18,13 +18,14 @@ const FestivalPage = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
   // 축제 상세 데이터 가져오기
   useEffect(() => {
     const fetchFestivalDetails = async () => {
       try {
         console.log("Fetching festival details for ID:", eventId);
-        const response = await axios.get(`/api/festivals/${eventId}`);
+        const response = await axios.get(`${API_BASE_URL}/festivals/${eventId}`);
         console.log("API Response:", response.data);
         setEvent(response.data);
       } catch (err) {
