@@ -9,7 +9,7 @@ const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { accessToken, setAccessToken, setRefreshToken, setUserName, fcmToken, setFcmToken } = useContext(AuthContext);
+    const { accessToken, setAccessToken, setRefreshToken, setUserName, fcmToken, setFcmToken, setIdToken } = useContext(AuthContext);
 
     // 로고 클릭 이벤트 핸들러
     const handleLogoClick = () => {
@@ -49,6 +49,9 @@ const Header = () => {
             setAccessToken("");
             setRefreshToken("");
             setUserName("");
+            setIdToken("");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userNickname");
 
             alert("로그아웃되었습니다.");
             navigate('/');
