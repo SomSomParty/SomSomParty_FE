@@ -15,9 +15,8 @@ function SignUpPage() {
   const [error, setError] = useState(""); 
   const [success, setSuccess] = useState("");
   const navigate = useNavigate(); 
-
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
  
-
   const handleChange = (e) => {
     const { name, value } = e.target; 
     setFormData({ ...formData, [name]: value }); 
@@ -25,12 +24,11 @@ function SignUpPage() {
 
   const handleSignup = async () => {
     const { name, email, password } = formData;
-    const apiUrl = '/api/signup';
-
+    
     try {
       console.log("회원가입 요청 데이터:", formData);
 
-      const response = await axios.post(apiUrl, {
+      const response = await axios.post(`${API_BASE_URL}/signup`, {
         email,
         password,
       });
@@ -47,11 +45,10 @@ function SignUpPage() {
   };
 
   const handleVerify = async () => {
-    const apiUrl = '/api/confirm-signup';
     const { name, email } = formData;
 
     try {
-      const response = await axios.post(apiUrl, {
+      const response = await axios.post(`${API_BASE_URL}/confirm-signup`, {
           name,
           email,
           code: verificationCode,

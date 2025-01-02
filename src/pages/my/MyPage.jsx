@@ -14,6 +14,7 @@ const MyPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
   const { accessToken } = useContext(AuthContext);
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
   // 예약 목록 가져오기
   const fetchReservationList = async () => {
@@ -21,7 +22,7 @@ const MyPage = () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get("/api/reservations", {
+      const response = await axios.get(`${API_BASE_URL}/reservations`, {
         params: {
           lastId: lastId,
           limit: limit,

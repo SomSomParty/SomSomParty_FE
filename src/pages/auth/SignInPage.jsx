@@ -10,8 +10,8 @@ function SignInPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState(""); // 로그인 실패 시 에러 메시지
   const [success, setSuccess] = useState(""); // 성공 메시지 관리
-
   const { setAccessToken, setRefreshToken, setUserName, setFcmToken, setIdToken } = useContext(AuthContext);
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
   const navigate = useNavigate(); 
 
@@ -22,12 +22,11 @@ function SignInPage() {
 
   const handleLogin = async () => {
     const { email, password } = formData;
-    const signinUri = '/api/login'; 
 
     try {
       console.log("로그인 요청 데이터:", formData);
 
-      const response = await axios.post(signinUri, {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
         email, 
         password,
       });
@@ -61,7 +60,7 @@ function SignInPage() {
           console.log("푸시 토큰 전송 시작:", fcmToken);
 
           await axios.post(
-            '/api/notification/activate',
+            '$/notification/activate',
             { 
               token: fcmToken, 
               deviceType: 'WEB', 

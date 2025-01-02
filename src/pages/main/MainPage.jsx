@@ -15,7 +15,6 @@ const MainPage = () => {
     const navigate = useNavigate(); // 페이지 이동을 위한 navigate
     const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
-    console.log(API_BASE_URL);
     // 축제 목록 가져오기
     const fetchFestivalList = async () => {
         setError(null);
