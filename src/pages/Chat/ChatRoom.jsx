@@ -15,7 +15,7 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
   const [stompClient, setStompClient] = useState(null); // Stomp client 상태
   const stompClientRef = useRef(null);
 
-  const socketUrl = "ws://localhost:8080/ws-chat"; // WebSocket 서버 URL
+  const socketUrl = "ws://somsomparty.store/ws-chat"; // WebSocket 서버 URL
 
   // 시간 형식 변환 함수
   const formatTime = (epochSeconds) => {
