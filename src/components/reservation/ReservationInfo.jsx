@@ -15,11 +15,12 @@ const ReservationInfo = ({ festivalId, selectedDate }) => {
     setUserName,
   } = useContext(AuthContext);
   const accessTokenRef = useRef(accessToken);
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
   const handleNext = async () => {
     try {
       await axios.post(
-        "/api/reservations",
+        `${API_BASE_URL}/reservations`,
         {
           festivalId: festivalId,
           festivalDate: selectedDate,
@@ -46,7 +47,7 @@ const ReservationInfo = ({ festivalId, selectedDate }) => {
 
   const reissueAccessToken = async () => {
     try {
-      const apiResponse = await axios.post(`/api/refresh-token`, null, {
+      const apiResponse = await axios.post(`${API_BASE_URL}/refresh-token`, null, {
         headers: {
           Refreshtoken: refreshToken, // 리프레시 토큰을 인증 헤더로 추가
         },
