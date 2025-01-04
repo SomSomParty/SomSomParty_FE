@@ -21,7 +21,7 @@ messaging.onBackgroundMessage((payload) => {
         body: payload.notification?.body || "Default body",
         icon: payload.notification?.icon || '/firebase-logo.png',
         data: {
-            click_action: payload.notification?.click_action || 'https://daaal62eavqk0.cloudfront.net', 
+            click_action: 'https://daaal62eavqk0.cloudfront.net', 
         },
     };
 
