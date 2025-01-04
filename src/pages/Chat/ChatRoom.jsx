@@ -90,24 +90,27 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
     };
   }, [chat.id]);
 
-  // 스크롤을 항상 최신 메시지에 고정
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current && messages.length > 0) {
+      // 스크롤을 가장 아래로 이동 (새로운 메시지가 추가될 때만)
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   // 이전 메시지 로드
   const loadPreviousMessages = async () => {
     if (loading || !lastEvaluatedSendTime) return; // 이미 로딩 중이거나 더 가져올 메시지가 없으면 종료
     setLoading(true);
-
+  
+    // 현재 스크롤 위치와 높이 저장
     const currentScrollHeight = messagesContainerRef.current.scrollHeight;
     const currentScrollTop = messagesContainerRef.current.scrollTop;
-
+  
     try {
       const previousMessages = await getChatMessages(
-          chat.id,
-          lastEvaluatedSendTime,
-          userId
+        chat.id,
+        lastEvaluatedSendTime,
+        userId
       );
       if (previousMessages.messages?.length > 0) {
         const formattedMessages = previousMessages.messages.map((message) => ({
@@ -116,7 +119,8 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
         }));
         setMessages((prev) => [...formattedMessages, ...prev]);
         setLastEvaluatedSendTime(previousMessages.lastEvaluatedSendTime);
-
+  
+        // 스크롤 위치 유지
         setTimeout(() => {
           const newScrollHeight = messagesContainerRef.current.scrollHeight;
           messagesContainerRef.current.scrollTop =
