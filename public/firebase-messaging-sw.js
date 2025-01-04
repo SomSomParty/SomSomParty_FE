@@ -15,12 +15,15 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] 백그라운드 메시지 수신', payload);
-    
+
     const notificationTitle = payload.notification?.title || "Default Title";
     const notificationOptions = {
         body: payload.notification?.body || "Default body",
         icon: payload.notification?.icon || '/firebase-logo.png',
+        data: {
+            click_action: payload.notification?.click_action || 'https://daaal62eavqk0.cloudfront.net', 
+        },
     };
-  
+
     self.registration.showNotification(notificationTitle, notificationOptions);
-  });
+});
