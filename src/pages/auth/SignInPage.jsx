@@ -60,7 +60,7 @@ function SignInPage() {
           console.log("푸시 토큰 전송 시작:", fcmToken);
 
           await axios.post(
-            '$/notification/activate',
+            `${API_BASE_URL}/notification/activate`,
             { 
               token: fcmToken, 
               deviceType: 'WEB', 
