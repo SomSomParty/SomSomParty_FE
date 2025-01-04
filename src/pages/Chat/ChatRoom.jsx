@@ -57,7 +57,15 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
   
       client.subscribe(`/topic/chat/chatRoomId${chat.id}`, (message) => {
         const newMessage = JSON.parse(message.body);
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        if (newMessage.senderId === userId) return;
+        setMessages((prevMessages) => {
+          const isDuplicate = prevMessages.some(
+            (msg) => msg.sendTime === newMessage.sendTime && msg.senderId === newMessage.senderId
+          );
+          if (isDuplicate) return prevMessages;
+  
+          return [...prevMessages, newMessage];
+        });
       });
     });
   
@@ -139,7 +147,6 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
 
     if (stompClient && stompClient.connected) {
       stompClient.send("/publish/chat.send", {}, JSON.stringify(messageData));
-      setMessages((prev) => [...prev, { ...messageData, isMyMessage: true }]);
       setNewMessage("");
     } else {
       console.error("WebSocket 연결이 유효하지 않습니다.");
