@@ -55,7 +55,7 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
     client.connect({ userId: userId, chatRoomId: chat.id }, () => {
       console.log("웹소켓 연결 성공");
   
-      client.subscribe(`/topic/chat/${chat.id}`, (message) => {
+      client.subscribe(`/topic/chat/chatRoomId${chat.id}`, (message) => {
         const newMessage = JSON.parse(message.body);
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
