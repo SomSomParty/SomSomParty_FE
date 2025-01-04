@@ -58,13 +58,18 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
       client.subscribe(`/topic/chat/chatRoomId${chat.id}`, (message) => {
         const newMessage = JSON.parse(message.body);
         if (newMessage.senderId === userId) return;
-        setMessages((prevMessages) => {
-          const isDuplicate = prevMessages.some(
-            (msg) => msg.sendTime === newMessage.sendTime && msg.senderId === newMessage.senderId
-          );
-          if (isDuplicate) return prevMessages;
-  
-          return [...prevMessages, newMessage];
+  setMessages((prevMessages) => {
+    const isDuplicate = prevMessages.some(
+      (msg) =>
+        msg.sendTime === newMessage.sendTime &&
+        msg.senderId === newMessage.senderId
+    );
+    if (isDuplicate) return prevMessages;
+
+    return [
+      ...prevMessages,
+      { ...newMessage, isMyMessage: newMessage.senderId === userId },
+    ];
         });
       });
     });
@@ -144,6 +149,11 @@ const ChatRoom = ({ chat, messages: initialMessages }) => {
       chatRoomId: chat.id,
     };
     console.log(messageData.sendTime)
+    const localMessage = {
+      ...messageData,
+      isMyMessage: true,
+    };
+    setMessages((prevMessages) => [...prevMessages, localMessage]);
 
     if (stompClient && stompClient.connected) {
       stompClient.send("/publish/chat.send", {}, JSON.stringify(messageData));
