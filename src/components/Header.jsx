@@ -8,7 +8,7 @@ import { AuthContext } from '../context/AuthContext';
 const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
     const { accessToken, setAccessToken, setRefreshToken, setUserName, fcmToken, setFcmToken, setIdToken } = useContext(AuthContext);
 
     // 로고 클릭 이벤트 핸들러
@@ -21,8 +21,8 @@ const Header = () => {
     };
 
     const handleLogout = async () => {
-        const logoutUrl = '/api/signout'; 
-        const deactivateTokenUrl = '/api/notification/deactivate';
+        const logoutUrl = `${API_BASE_URL}/signout`; 
+        const deactivateTokenUrl = `${API_BASE_URL}/notification/deactivate`;
 
         try {
             await axios.post(deactivateTokenUrl, { token: fcmToken }, {
